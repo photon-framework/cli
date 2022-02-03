@@ -1,11 +1,11 @@
 {
   "name": "photon-cli",
   "bin": {
-    "photon": "./cli.js"
+    "photon": "./index.js"
   },
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "test": "yarn build && node ./cli.js ../homepage/src/index.html"
+    "test": "yarn build && node ./index.js \"../homepage/src/\""
   },
   "version": "0.0.1",
   "description": "compiler for the photon web-framework",
