@@ -1,15 +1,13 @@
 import type { sourceDirsObj } from "./sourceDirs";
 import type { routerOptions } from "./parseSourceIndex";
-import { error } from "./console";
+import { mapRoutingAnchors } from "./mapRoutingAnchors";
+import { domRenderOptions } from "./domRenderOptions";
+import { error, log } from "./console";
 import { parseDocument } from "htmlparser2";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";
 import render from "dom-serializer";
-
-const domRenderOptions = {
-  selfClosingTags: true,
-};
 
 export const createStaticFiles = (
   dirs: sourceDirsObj,
@@ -18,6 +16,8 @@ export const createStaticFiles = (
 ) => {
   const origHtml = readFileSync(dirs.distIndex).toString();
   const dom = parseDocument(origHtml);
+
+  mapRoutingAnchors(dom);
 
   // read content files
   const contentFiles = new Map(
@@ -34,26 +34,34 @@ export const createStaticFiles = (
     })
   );
 
-  console.debug("contentFiles:", contentFiles);
-
-  const routerEl = findOne((el) => el.name === "photon:router", dom.childNodes);
+  const routerEl = findOne(
+    (el) => "photon-router" in el.attribs,
+    dom.childNodes
+  );
   if (!routerEl) {
-    error(`"${dirs.distIndex}" does not contain a <photon:router> element`);
+    error(
+      `"${dirs.distIndex}" does not contain a element that has the "photon-router" boolean-attribute`
+    );
     process.exit(1);
   }
 
-  routerEl.name = "router";
-  routerEl.attribs = {};
+  log("Writing router paths…");
+
+  const routerEmoji: string = "";
 
   // default
-  if (contentFiles.has(routerOptions.fallbackSite)) {
+  if (contentFiles.has(routerOptions.defaultSite)) {
+    log(routerEmoji, routerOptions.defaultSite, "(default)");
     routerEl.children = [contentFiles.get(routerOptions.defaultSite)!];
+    routerEl.attribs["data-route"] = routerOptions.defaultSite;
     writeFileSync(dirs.distIndex, render(dom, domRenderOptions));
   }
 
   // fallback
   if (contentFiles.has(routerOptions.fallbackSite)) {
+    log(routerEmoji, routerOptions.fallbackSite, "(fallback)");
     routerEl.children = [contentFiles.get(routerOptions.fallbackSite)!];
+    routerEl.attribs["data-route"] = routerOptions.fallbackSite;
     writeFileSync(
       join(dirs.distDir, "404.html"),
       render(dom, domRenderOptions)
@@ -63,7 +71,9 @@ export const createStaticFiles = (
   // other
   for (const [path, content] of contentFiles) {
     if (contentFiles.has(path)) {
+      log(routerEmoji, path);
       routerEl.children = [content];
+      routerEl.attribs["data-route"] = path;
       const distPath = join(dirs.distDir, path);
       if (!existsSync(distPath)) {
         mkdirSync(distPath, { recursive: true });

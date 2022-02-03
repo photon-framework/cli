@@ -7,9 +7,11 @@ import { getContentFiles } from "./getContentFiles";
 import { createStaticFiles } from "./createStaticFiles";
 import { log, error } from "./console";
 import { clearDirectory } from "./clearDirectory";
-
 import { existsSync } from "fs";
 import { Parcel } from "@parcel/core";
+
+// import { registerHandler } from "segfault-handler";
+// registerHandler();
 
 // Get directories and index file
 const dirs = sourceDirs(args);
@@ -21,6 +23,11 @@ if (!existsSync(dirs.sourceIndex)) {
 if (existsSync(dirs.distDir)) {
   log(`clearing "${dirs.distDir}"…`);
   clearDirectory(dirs.distDir);
+}
+
+if (existsSync(dirs.cacheDir)) {
+  log(`clearing "${dirs.cacheDir}"…`);
+  clearDirectory(dirs.cacheDir);
 }
 
 // Get options from router attributes

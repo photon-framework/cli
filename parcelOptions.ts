@@ -6,6 +6,8 @@ export const parcelOptions = (
   contentFiles: Array<string>
 ): InitialParcelOptions => ({
   entries: [dirs.sourceIndex, ...contentFiles],
+  // shouldDisableCache: true,
+  cacheDir: dirs.cacheDir,
   defaultTargetOptions: {
     distDir: dirs.distDir,
     engines: {

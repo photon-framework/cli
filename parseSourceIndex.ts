@@ -2,8 +2,9 @@ import type { sourceDirsObj } from "./sourceDirs";
 import { error, log } from "./console";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { findAll } from "domutils";
+import { findAll, findOne } from "domutils";
 import { parseDocument } from "htmlparser2";
+import type { Document } from "domhandler";
 
 export type routerOptions = {
   contentDir: string;
@@ -11,11 +12,25 @@ export type routerOptions = {
   fallbackSite: string;
 };
 
-export const parseSourceIndex = (dirs: sourceDirsObj): routerOptions => {
-  const dom = parseDocument(readFileSync(dirs.sourceIndex).toString());
+const ensureRuntimeIncluded = (dom: Document) => {
+  if (
+    !findOne(
+      (el) =>
+        el.name === "script" &&
+        "src" in el.attribs &&
+        el.attribs["src"]!.endsWith("photon-re/core.js"),
+      dom.childNodes
+    )
+  ) {
+    error("No runtime script found");
+    process.exit(1);
+  }
+};
+
+const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
   const nodes = dom.childNodes;
 
-  const routers = findAll((el) => el.name === "photon:router", nodes);
+  const routers = findAll((el) => "photon-router" in el.attribs, nodes);
   if (routers.length !== 1) {
     error("Exactly one router element is required");
     process.exit(1);
@@ -52,4 +67,12 @@ export const parseSourceIndex = (dirs: sourceDirsObj): routerOptions => {
   log("Router options:", routerOptions);
 
   return routerOptions;
+};
+
+export const parseSourceIndex = (dirs: sourceDirsObj): routerOptions => {
+  const dom = parseDocument(readFileSync(dirs.sourceIndex).toString());
+
+  ensureRuntimeIncluded(dom);
+
+  return getRouterOptions(dom, dirs);
 };

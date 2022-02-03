@@ -1,11 +1,13 @@
-import { statSync, existsSync } from "fs";
+import { statSync, existsSync, writeFileSync, mkdirSync } from "fs";
 import { join, resolve, dirname, basename, normalize } from "path";
+import { EOL } from "os";
 
 export type sourceDirsObj = {
   sourceDir: string;
   sourceIndex: string;
   distDir: string;
   distIndex: string;
+  cacheDir: string;
 };
 
 export const sourceDirs = (args: Array<string>): sourceDirsObj => {
@@ -36,5 +38,17 @@ export const sourceDirs = (args: Array<string>): sourceDirsObj => {
 
   const distIndex = join(distDir, basename(sourceIndex));
 
-  return { sourceDir, sourceIndex, distDir, distIndex };
+  const dotPhoton = join(distDir, "../photon");
+  if (!existsSync(dotPhoton)) {
+    mkdirSync(dotPhoton, { recursive: true });
+  }
+  writeFileSync(join(dotPhoton, ".gitignore"), "*" + EOL);
+
+  return {
+    sourceDir,
+    sourceIndex,
+    distDir,
+    distIndex,
+    cacheDir: join(dotPhoton, "cache"),
+  };
 };
