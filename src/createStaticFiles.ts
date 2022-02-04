@@ -1,8 +1,8 @@
-import type { sourceDirsObj } from "./sourceDirs";
-import type { routerOptions } from "./parseSourceIndex";
-import { mapRoutingAnchors } from "./mapRoutingAnchors";
-import { domRenderOptions } from "./domRenderOptions";
-import { error, log } from "./console";
+import type { sourceDirsObj } from "./sourceDirs.js";
+import type { routerOptions } from "./parseSourceIndex.js";
+import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
+import { domRenderOptions } from "./domRenderOptions.js";
+import { error, log } from "./console.js";
 import { parseDocument } from "htmlparser2";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { relative, join } from "path";
@@ -45,7 +45,7 @@ export const createStaticFiles = (
     process.exit(1);
   }
 
-  log("Writing router paths…");
+  log("Writing router paths...");
 
   const routerEmoji: string = "";
 
