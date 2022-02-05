@@ -1,7 +1,7 @@
 import { readdirSync, statSync } from "fs";
 import { join } from "path";
 
-export const getContentFiles = (contentDir: string) => {
+export const findContentFilesInSource = (contentDir: string) => {
   const contentFiles = new Set<string>();
 
   const paths = readdirSync(contentDir).map((p) => join(contentDir, p));

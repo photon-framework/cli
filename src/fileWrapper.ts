@@ -1,5 +1,7 @@
+import { domRenderOptions } from "./domRenderOptions.js";
 import { parseDocument } from "htmlparser2";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
+import { render } from "@frank-mayer/dom-serializer";
 import type { Document } from "domhandler";
 
 const DOMcache = new Map<string, Document>();
@@ -12,4 +14,9 @@ export const getDOM = (file: string): Document => {
   const dom = parseDocument(readFileSync(file).toString());
   DOMcache.set(file, dom);
   return dom;
+};
+
+export const exportDOM = (dom: Document, file: string): void => {
+  DOMcache.set(file, dom);
+  writeFileSync(file, render(dom, domRenderOptions));
 };

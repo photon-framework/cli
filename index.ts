@@ -3,14 +3,16 @@ const [, , ...args] = process.argv;
 import { sourceDirs } from "./src/sourceDirs.js";
 import { parseSourceIndex } from "./src/parseSourceIndex.js";
 import { parcelOptions } from "./src/parcelOptions.js";
-import { getContentFiles as findContentFilesInSource } from "./src/getContentFiles.js";
+import { findContentFilesInSource } from "./src/findContentFilesInSource.js";
 import { createStaticFiles } from "./src/createStaticFiles.js";
-import { log, error } from "./src/console.js";
+import { log, error, cc } from "./src/console.js";
 import { clearDirectory } from "./src/clearDirectory.js";
-import { getTemplateFiles as findTemplatesInContentFiles } from "./src/getTemplateFiles.js";
+import { findTemplatesInContentFiles } from "./src/findTemplatesInContentFiles.js";
 import { getDOM } from "./src/fileWrapper.js";
 import { Parcel } from "@parcel/core";
 import { existsSync } from "fs";
+
+const startTime = Date.now();
 
 try {
   // Get directories and index file
@@ -47,6 +49,13 @@ try {
       log(`📦 Parcel build completed in ${ev.buildTime}ms`);
 
       createStaticFiles(dirs, routerOptions, contentFiles);
+
+      log(
+        ` ${cc.bg.green}${cc.fg.black} Build done in ${(
+          (Date.now() - startTime) /
+          1000
+        ).toFixed(2)} seconds ${cc.reset}`
+      );
     })
     .catch((err) => {
       error("Parcel build failed", err);

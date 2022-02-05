@@ -2,13 +2,11 @@ import type { sourceDirsObj } from "./sourceDirs.js";
 import type { routerOptions } from "./parseSourceIndex.js";
 import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
 import { mapReferences } from "./mapReferences.js";
-import { domRenderOptions } from "./domRenderOptions.js";
 import { error, log } from "./console.js";
-import { getDOM } from "./fileWrapper.js";
-import { writeFileSync, existsSync, mkdirSync } from "fs";
+import { exportDOM, getDOM } from "./fileWrapper.js";
+import { existsSync, mkdirSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";
-import { render } from "@frank-mayer/dom-serializer";
 import type { Document, Element } from "domhandler";
 
 const routerEmoji: string = "";
@@ -47,12 +45,13 @@ const writeRoute = (
     "→",
     "/" + routeTarget
   );
+  mapReferences(el, dirs.distDir);
   routerEl.children = [el];
   const virtualLocation = "/" + routeTarget;
   routerEl.attribs["data-route"] = virtualLocation;
   mapRoutingAnchors(dom, virtualLocation);
   mapReferences(dom, dirs.distDir);
-  writeFileSync(urlLocation, render(dom, domRenderOptions));
+  exportDOM(dom, urlLocation);
 };
 
 export const createStaticFiles = (

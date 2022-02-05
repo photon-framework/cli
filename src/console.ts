@@ -53,7 +53,7 @@ export function error(...message: Array<any>): void {
 }
 
 export function warn(message: string): void {
-  console.warn(message);
+  console.warn(cc.fg.yellow + "! " + message + cc.reset);
 }
 
 export function log(message: string): void;
@@ -61,11 +61,8 @@ export function log(...message: Array<any>): void;
 export function log(...message: Array<any>): void {
   process.stdout.write(
     [
-      ...message.map(
-        (m) =>
-          cc.fg.blue +
-          (typeof m === "string" ? m : JSON.stringify(m, undefined, 2)) +
-          cc.reset
+      ...message.map((m) =>
+        typeof m === "string" ? m : JSON.stringify(m, undefined, 2)
       ),
     ].join(" ") + EOL
   );
