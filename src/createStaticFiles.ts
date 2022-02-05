@@ -4,7 +4,8 @@ import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
 import { mapReferences } from "./mapReferences.js";
 import { error, log } from "./console.js";
 import { exportDOM, getDOM, sourceToDist } from "./fileWrapper.js";
-import { existsSync, mkdirSync } from "fs";
+import { createSitemap } from "./createSitemap.js";
+import { existsSync, mkdirSync, writeFileSync, copyFileSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";
 import type { Document, Element } from "domhandler";
@@ -120,6 +121,20 @@ export const createStaticFiles = (
       dom,
       join(distPath, "index.html"),
       path
+    );
+  }
+
+  // sitemap
+  const sitemapSrcPath = join(dirs.sourceDir, "sitemap.xml");
+  const sitemapDistPath = join(dirs.distDir, "sitemap.xml");
+  if (existsSync(sitemapSrcPath)) {
+    log("Copy sitemap.xml to dist...");
+    copyFileSync(sitemapSrcPath, sitemapDistPath);
+  } else if (routerOptions.canonical) {
+    log("Writing sitemap.xml...");
+    writeFileSync(
+      sitemapDistPath,
+      createSitemap(contentFiles, routerOptions.canonical)
     );
   }
 };

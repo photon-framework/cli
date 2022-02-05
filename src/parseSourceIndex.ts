@@ -8,6 +8,7 @@ export type routerOptions = {
   contentDir: string;
   defaultSite: string;
   fallbackSite: string;
+  canonical: string | undefined;
 };
 
 const ensureRuntimeIncluded = (dom: Document) => {
@@ -28,6 +29,15 @@ const ensureRuntimeIncluded = (dom: Document) => {
 const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
   const nodes = dom.childNodes;
 
+  const canonical = findOne(
+    (el) =>
+      el.name === "link" &&
+      "rel" in el.attribs &&
+      el.attribs["rel"] === "canonical" &&
+      "href" in el.attribs,
+    nodes
+  );
+
   const router = findOne((el) => "photon-router" in el.attribs, nodes);
   if (!router) {
     error("No router element found");
@@ -37,6 +47,7 @@ const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
     contentDir: router!.attribs["data-content"] as string,
     defaultSite: router!.attribs["data-default"] as string,
     fallbackSite: router!.attribs["data-fallback"] as string,
+    canonical: canonical ? canonical.attribs["href"] : undefined,
   };
 
   if (routerOptions.contentDir) {
