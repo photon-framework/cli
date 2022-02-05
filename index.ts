@@ -48,6 +48,6 @@ bundler
     createStaticFiles(dirs, routerOptions, contentFiles);
   })
   .catch((err) => {
-    error(err);
+    error("Parcel build failed", err);
     process.exit(1);
   });

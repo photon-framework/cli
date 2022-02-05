@@ -6,24 +6,25 @@ export const parcelOptions = (
   contentFiles: Array<string>
 ): InitialParcelOptions => ({
   entries: [dirs.sourceIndex, ...contentFiles],
-  // shouldDisableCache: true,
+  shouldDisableCache: true,
   // cacheDir: dirs.cacheDir,
   defaultTargetOptions: {
     distDir: dirs.distDir,
-    // engines: {
-    //   browsers: ["last 2 versions", "ie >= 11", "safari >= 10"],
-    // },
-    // isLibrary: false,
-    // outputFormat: "global",
-    // shouldOptimize: true,
-    // sourceMaps: false,
+    engines: {
+      browsers: ["last 2 versions", "ie >= 11", "safari >= 10"],
+    },
+    isLibrary: false,
+    outputFormat: "global",
+    shouldOptimize: true,
+    sourceMaps: false,
   },
-  // mode: "production",
+  mode: "production",
   logLevel: "verbose",
   defaultConfig: "@parcel/config-default",
   shouldAutoInstall: true,
-  // shouldContentHash: true,
-  // env: {
-  //   NODE_ENV: "production",
-  // },
+  shouldContentHash: true,
+  env: {
+    NODE_ENV: "production",
+    PARCEL_WORKERS: "0",
+  },
 });
