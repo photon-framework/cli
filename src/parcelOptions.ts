@@ -7,8 +7,8 @@ export const parcelOptions = (
   templateFiles: Iterable<string>
 ): InitialParcelOptions => ({
   entries: [dirs.sourceIndex, ...contentFiles, ...templateFiles],
-  shouldDisableCache: true,
-  // cacheDir: dirs.cacheDir,
+  // shouldDisableCache: true,
+  cacheDir: dirs.cacheDir,
   defaultTargetOptions: {
     distDir: dirs.distDir,
     engines: {

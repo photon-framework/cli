@@ -3,7 +3,7 @@ import type { routerOptions } from "./parseSourceIndex.js";
 import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
 import { mapReferences } from "./mapReferences.js";
 import { error, log } from "./console.js";
-import { exportDOM, getDOM } from "./fileWrapper.js";
+import { exportDOM, getDOM, sourceToDist } from "./fileWrapper.js";
 import { existsSync, mkdirSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";
@@ -12,6 +12,7 @@ import type { Document, Element } from "domhandler";
 const routerEmoji: string = "";
 
 const readDomFromContentFileDirs = (
+  dirs: sourceDirsObj,
   routerOptions: routerOptions,
   contentFilesDirs: Iterable<string>
 ) =>
@@ -21,7 +22,11 @@ const readDomFromContentFileDirs = (
         /^[\/\\]/,
         ""
       );
-      return [relativePath.substring(0, relativePath.length - 5), getDOM(dir)];
+
+      return [
+        relativePath.substring(0, relativePath.length - 5),
+        getDOM(sourceToDist(dirs, dir)),
+      ];
     })
   );
 
@@ -63,6 +68,7 @@ export const createStaticFiles = (
 
   // read content dom of files
   const contentFiles = readDomFromContentFileDirs(
+    dirs,
     routerOptions,
     contentFilesDirs
   );
