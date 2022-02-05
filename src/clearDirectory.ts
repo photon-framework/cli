@@ -1,4 +1,4 @@
-import { readdirSync, statSync, rmSync, unlinkSync } from "fs";
+import { readdirSync, statSync, rmSync } from "fs";
 import { join } from "path";
 
 export const clearDirectory = (path: string) => {
@@ -8,7 +8,7 @@ export const clearDirectory = (path: string) => {
     if (stat.isDirectory()) {
       rmSync(filePath, { recursive: true });
     } else {
-      unlinkSync(filePath);
+      rmSync(filePath);
     }
   }
 };

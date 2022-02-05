@@ -1,28 +1,39 @@
 {
   "name": "photon-cli",
+  "displayName": "Photon CLI",
+  "type": "module",
   "bin": {
     "photon": "./index.js"
   },
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "test": "yarn build && node ./index.js \"../homepage/src/\""
+    "test": "tsc -p ./tsconfig.json && node ./index.js \"../homepage/src/\""
   },
   "version": "0.0.1",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
-  "repository": "https://github.com/Frank-Mayer/photon-cli.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/photon-framework/cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/photon-framework/cli/issues"
+  },
+  "homepage": "https://github.com/photon-framework",
   "author": "Frank Mayer <frank.mayer1907@protonmail.com>",
   "license": "MIT",
   "private": false,
   "dependencies": {
     "@parcel/config-default": "^2.2.1",
     "@parcel/core": "^2.2.1",
-    "css-select": "^4.2.1",
-    "dom-serializer": "^1.3.2",
+    "@parcel/reporter-dev-server": "^2.2.1",
+    "@parcel/resolver-default": "^2.2.1",
+    "@frank-mayer/dom-serializer": "^2.0.1",
     "domhandler": "^4.3.0",
     "domutils": "^2.8.0",
-    "htmlparser2": "^7.2.0",
-    "parcel": "^2.2.1",
-    "typescript": "^4.6.0-dev.20220201"
+    "htmlparser2": "^7.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.0-dev.20220204"
   }
 }

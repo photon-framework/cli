@@ -1,4 +1,4 @@
-import type { sourceDirsObj } from "./sourceDirs";
+import type { sourceDirsObj } from "./sourceDirs.js";
 import type { InitialParcelOptions } from "@parcel/types";
 
 export const parcelOptions = (
@@ -6,12 +6,12 @@ export const parcelOptions = (
   contentFiles: Array<string>
 ): InitialParcelOptions => ({
   entries: [dirs.sourceIndex, ...contentFiles],
-  // shouldDisableCache: true,
-  cacheDir: dirs.cacheDir,
+  shouldDisableCache: true,
+  // cacheDir: dirs.cacheDir,
   defaultTargetOptions: {
     distDir: dirs.distDir,
     engines: {
-      browsers: ["last 2 versions"],
+      browsers: ["last 2 versions", "ie >= 11", "safari >= 10"],
     },
     isLibrary: false,
     outputFormat: "global",
@@ -25,5 +25,6 @@ export const parcelOptions = (
   shouldContentHash: true,
   env: {
     NODE_ENV: "production",
+    PARCEL_WORKERS: "0",
   },
 });

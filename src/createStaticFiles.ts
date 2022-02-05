@@ -1,13 +1,13 @@
-import type { sourceDirsObj } from "./sourceDirs";
-import type { routerOptions } from "./parseSourceIndex";
-import { mapRoutingAnchors } from "./mapRoutingAnchors";
-import { domRenderOptions } from "./domRenderOptions";
-import { error, log } from "./console";
+import type { sourceDirsObj } from "./sourceDirs.js";
+import type { routerOptions } from "./parseSourceIndex.js";
+import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
+import { domRenderOptions } from "./domRenderOptions.js";
+import { error, log } from "./console.js";
 import { parseDocument } from "htmlparser2";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";
-import render from "dom-serializer";
+import { render } from "@frank-mayer/dom-serializer";
 
 export const createStaticFiles = (
   dirs: sourceDirsObj,
@@ -16,6 +16,12 @@ export const createStaticFiles = (
 ) => {
   const origHtml = readFileSync(dirs.distIndex).toString();
   const dom = parseDocument(origHtml);
+
+  try {
+    console.debug(render(dom));
+  } catch (e) {
+    console.error(e);
+  }
 
   mapRoutingAnchors(dom);
 
@@ -38,6 +44,7 @@ export const createStaticFiles = (
     (el) => "photon-router" in el.attribs,
     dom.childNodes
   );
+
   if (!routerEl) {
     error(
       `"${dirs.distIndex}" does not contain a element that has the "photon-router" boolean-attribute`
@@ -45,23 +52,31 @@ export const createStaticFiles = (
     process.exit(1);
   }
 
-  log("Writing router paths…");
+  log("Writing router paths...");
 
   const routerEmoji: string = "";
 
   // default
   if (contentFiles.has(routerOptions.defaultSite)) {
-    log(routerEmoji, routerOptions.defaultSite, "(default)");
-    routerEl.children = [contentFiles.get(routerOptions.defaultSite)!];
-    routerEl.attribs["data-route"] = routerOptions.defaultSite;
-    writeFileSync(dirs.distIndex, render(dom, domRenderOptions));
+    const el = contentFiles.get(routerOptions.defaultSite);
+    if (el) {
+      log(routerEmoji, routerOptions.defaultSite, "(default)");
+      routerEl.children = [el];
+      routerEl.attribs["data-route"] = "/" + routerOptions.defaultSite;
+      writeFileSync(dirs.distIndex, render(dom, domRenderOptions));
+      console.debug(`wrote to "${dirs.distIndex}"`);
+    } else {
+      error(
+        `Failed to write "${routerOptions.defaultSite}", not in content-files "${routerOptions.contentDir}"`
+      );
+    }
   }
 
   // fallback
   if (contentFiles.has(routerOptions.fallbackSite)) {
     log(routerEmoji, routerOptions.fallbackSite, "(fallback)");
     routerEl.children = [contentFiles.get(routerOptions.fallbackSite)!];
-    routerEl.attribs["data-route"] = routerOptions.fallbackSite;
+    routerEl.attribs["data-route"] = "/" + routerOptions.fallbackSite;
     writeFileSync(
       join(dirs.distDir, "404.html"),
       render(dom, domRenderOptions)
@@ -73,7 +88,7 @@ export const createStaticFiles = (
     if (contentFiles.has(path)) {
       log(routerEmoji, path);
       routerEl.children = [content];
-      routerEl.attribs["data-route"] = path;
+      routerEl.attribs["data-route"] = "/" + path;
       const distPath = join(dirs.distDir, path);
       if (!existsSync(distPath)) {
         mkdirSync(distPath, { recursive: true });

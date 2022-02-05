@@ -1,5 +1,5 @@
-import type { sourceDirsObj } from "./sourceDirs";
-import { error, log } from "./console";
+import type { sourceDirsObj } from "./sourceDirs.js";
+import { error, log } from "./console.js";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { findAll, findOne } from "domutils";
