@@ -48,7 +48,7 @@ try {
 
       log(`📦 Parcel build completed in ${ev.buildTime}ms`);
 
-      createStaticFiles(dirs, routerOptions, contentFiles);
+      createStaticFiles(dirs, routerOptions, contentFiles, templateFiles);
 
       log(
         ` ${cc.bg.green}${cc.fg.black} Build done in ${(

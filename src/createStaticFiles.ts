@@ -63,7 +63,8 @@ const writeRoute = (
 export const createStaticFiles = (
   dirs: sourceDirsObj,
   routerOptions: routerOptions,
-  contentFilesDirs: Iterable<string>
+  contentFilesDirs: Iterable<string>,
+  templateFiles: Iterable<string>
 ) => {
   const dom = getDOM(dirs.distIndex);
 
@@ -135,6 +136,36 @@ export const createStaticFiles = (
     writeFileSync(
       sitemapDistPath,
       createSitemap(contentFiles, routerOptions.canonical)
+    );
+  }
+
+  // robots.txt
+  const robotsSrcPath = join(dirs.sourceDir, "robots.txt");
+  const robotsDistPath = join(dirs.distDir, "robots.txt");
+  if (existsSync(robotsSrcPath)) {
+    log("Copy robots.txt to dist...");
+    copyFileSync(robotsSrcPath, robotsDistPath);
+  } else if (routerOptions.canonical) {
+    log("Writing robots.txt...");
+    writeFileSync(
+      robotsDistPath,
+      [
+        "User-agent: *",
+        "Allow: /",
+        `Disallow: /${relative(dirs.sourceDir, routerOptions.contentDir)}/*`,
+        ...Array.from(templateFiles).map(
+          (path) => "Disallow: /" + relative(dirs.sourceDir, path)
+        ),
+        "Disallow: /*.svg",
+        "Disallow: /*.png",
+        "Disallow: /*.jpg",
+        "Disallow: /*.jpeg",
+        "Disallow: /*.webp",
+        "Disallow: /*.css",
+        "Disallow: /*.js",
+        "Disallow: /*.map",
+        `Sitemap: ${routerOptions.canonical}/sitemap.xml\n`,
+      ].join("\n")
     );
   }
 };
