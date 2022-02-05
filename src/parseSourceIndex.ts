@@ -1,9 +1,7 @@
 import type { sourceDirsObj } from "./sourceDirs.js";
 import { error, log } from "./console.js";
-import { readFileSync } from "fs";
 import { join } from "path";
-import { findAll, findOne } from "domutils";
-import { parseDocument } from "htmlparser2";
+import { findOne } from "domutils";
 import type { Document } from "domhandler";
 
 export type routerOptions = {
@@ -24,31 +22,27 @@ const ensureRuntimeIncluded = (dom: Document) => {
     )
   ) {
     error("No runtime script found");
-    process.exit(1);
   }
 };
 
 const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
   const nodes = dom.childNodes;
 
-  const routers = findAll((el) => "photon-router" in el.attribs, nodes);
-  if (routers.length !== 1) {
-    error("Exactly one router element is required");
-    process.exit(1);
+  const router = findOne((el) => "photon-router" in el.attribs, nodes);
+  if (!router) {
+    error("No router element found");
   }
-  const router = routers[0]!;
 
   const routerOptions = {
-    contentDir: router.attribs["data-content"] as string,
-    defaultSite: router.attribs["data-default"] as string,
-    fallbackSite: router.attribs["data-fallback"] as string,
+    contentDir: router!.attribs["data-content"] as string,
+    defaultSite: router!.attribs["data-default"] as string,
+    fallbackSite: router!.attribs["data-fallback"] as string,
   };
 
   if (routerOptions.contentDir) {
     routerOptions.contentDir = join(dirs.sourceDir, routerOptions.contentDir);
   } else {
     error("data-content attribute is required for router");
-    process.exit(1);
   }
 
   if (routerOptions.defaultSite) {
@@ -62,7 +56,6 @@ const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
       : routerOptions.defaultSite;
   } else {
     error("data-default-site attribute is required for router");
-    process.exit(1);
   }
 
   log("Router options:", routerOptions);
@@ -70,9 +63,10 @@ const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
   return routerOptions;
 };
 
-export const parseSourceIndex = (dirs: sourceDirsObj): routerOptions => {
-  const dom = parseDocument(readFileSync(dirs.sourceIndex).toString());
-
+export const parseSourceIndex = (
+  dom: Document,
+  dirs: sourceDirsObj
+): routerOptions => {
   ensureRuntimeIncluded(dom);
 
   return getRouterOptions(dom, dirs);

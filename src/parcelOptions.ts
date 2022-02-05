@@ -3,9 +3,10 @@ import type { InitialParcelOptions } from "@parcel/types";
 
 export const parcelOptions = (
   dirs: sourceDirsObj,
-  contentFiles: Array<string>
+  contentFiles: Iterable<string>,
+  templateFiles: Iterable<string>
 ): InitialParcelOptions => ({
-  entries: [dirs.sourceIndex, ...contentFiles],
+  entries: [dirs.sourceIndex, ...contentFiles, ...templateFiles],
   shouldDisableCache: true,
   // cacheDir: dirs.cacheDir,
   defaultTargetOptions: {

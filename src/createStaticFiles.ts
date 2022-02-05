@@ -1,103 +1,120 @@
 import type { sourceDirsObj } from "./sourceDirs.js";
 import type { routerOptions } from "./parseSourceIndex.js";
 import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
+import { mapReferences } from "./mapReferences.js";
 import { domRenderOptions } from "./domRenderOptions.js";
 import { error, log } from "./console.js";
-import { parseDocument } from "htmlparser2";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { getDOM } from "./fileWrapper.js";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";
 import { render } from "@frank-mayer/dom-serializer";
+import type { Document, Element } from "domhandler";
 
-export const createStaticFiles = (
-  dirs: sourceDirsObj,
+const routerEmoji: string = "";
+
+const readDomFromContentFileDirs = (
   routerOptions: routerOptions,
-  contentFilesDirs: Array<string>
-) => {
-  const origHtml = readFileSync(dirs.distIndex).toString();
-  const dom = parseDocument(origHtml);
-
-  try {
-    console.debug(render(dom));
-  } catch (e) {
-    console.error(e);
-  }
-
-  mapRoutingAnchors(dom);
-
-  // read content files
-  const contentFiles = new Map(
-    contentFilesDirs.map((dir) => {
-      const content = readFileSync(dir).toString();
+  contentFilesDirs: Iterable<string>
+) =>
+  new Map(
+    Array.from(contentFilesDirs).map((dir) => {
       const relativePath = relative(routerOptions.contentDir, dir).replace(
         /^[\/\\]/,
         ""
       );
-      return [
-        relativePath.substring(0, relativePath.length - 5),
-        parseDocument(content),
-      ];
+      return [relativePath.substring(0, relativePath.length - 5), getDOM(dir)];
     })
   );
 
+const writeRoute = (
+  contentFiles: Map<string, Document>,
+  dirs: sourceDirsObj,
+  routerEl: Element,
+  dom: Document,
+  urlLocation: string,
+  routeTarget: string
+) => {
+  const el = contentFiles.get(routeTarget);
+  if (!el) {
+    error(`No content file found for target "${routeTarget}"`);
+    return;
+  }
+
+  log(
+    routerEmoji,
+    urlLocation.substring(dirs.distDir.length),
+    "→",
+    "/" + routeTarget
+  );
+  routerEl.children = [el];
+  const virtualLocation = "/" + routeTarget;
+  routerEl.attribs["data-route"] = virtualLocation;
+  mapRoutingAnchors(dom, virtualLocation);
+  mapReferences(dom, dirs.distDir);
+  writeFileSync(urlLocation, render(dom, domRenderOptions));
+};
+
+export const createStaticFiles = (
+  dirs: sourceDirsObj,
+  routerOptions: routerOptions,
+  contentFilesDirs: Iterable<string>
+) => {
+  const dom = getDOM(dirs.distIndex);
+
+  // read content dom of files
+  const contentFiles = readDomFromContentFileDirs(
+    routerOptions,
+    contentFilesDirs
+  );
+
+  // find router in main index dom
   const routerEl = findOne(
     (el) => "photon-router" in el.attribs,
     dom.childNodes
   );
-
   if (!routerEl) {
     error(
       `"${dirs.distIndex}" does not contain a element that has the "photon-router" boolean-attribute`
     );
-    process.exit(1);
+    return;
   }
 
-  log("Writing router paths...");
-
-  const routerEmoji: string = "";
+  log("Writing static routes...");
 
   // default
-  if (contentFiles.has(routerOptions.defaultSite)) {
-    const el = contentFiles.get(routerOptions.defaultSite);
-    if (el) {
-      log(routerEmoji, routerOptions.defaultSite, "(default)");
-      routerEl.children = [el];
-      routerEl.attribs["data-route"] = "/" + routerOptions.defaultSite;
-      writeFileSync(dirs.distIndex, render(dom, domRenderOptions));
-      console.debug(`wrote to "${dirs.distIndex}"`);
-    } else {
-      error(
-        `Failed to write "${routerOptions.defaultSite}", not in content-files "${routerOptions.contentDir}"`
-      );
-    }
-  }
+  writeRoute(
+    contentFiles,
+    dirs,
+    routerEl,
+    dom,
+    dirs.distIndex,
+    routerOptions.defaultSite
+  );
 
   // fallback
-  if (contentFiles.has(routerOptions.fallbackSite)) {
-    log(routerEmoji, routerOptions.fallbackSite, "(fallback)");
-    routerEl.children = [contentFiles.get(routerOptions.fallbackSite)!];
-    routerEl.attribs["data-route"] = "/" + routerOptions.fallbackSite;
-    writeFileSync(
-      join(dirs.distDir, "404.html"),
-      render(dom, domRenderOptions)
-    );
-  }
+  writeRoute(
+    contentFiles,
+    dirs,
+    routerEl,
+    dom,
+    join(dirs.distDir, "404.html"),
+    routerOptions.defaultSite
+  );
 
   // other
-  for (const [path, content] of contentFiles) {
-    if (contentFiles.has(path)) {
-      log(routerEmoji, path);
-      routerEl.children = [content];
-      routerEl.attribs["data-route"] = "/" + path;
-      const distPath = join(dirs.distDir, path);
-      if (!existsSync(distPath)) {
-        mkdirSync(distPath, { recursive: true });
-      }
-
-      writeFileSync(
-        join(distPath, "index.html"),
-        render(dom, domRenderOptions)
-      );
+  for (const path of contentFiles.keys()) {
+    const distPath = join(dirs.distDir, path);
+    if (!existsSync(distPath)) {
+      mkdirSync(distPath, { recursive: true });
     }
+    writeRoute(
+      contentFiles,
+      dirs,
+      routerEl,
+      dom,
+      join(distPath, "index.html"),
+      path
+    );
   }
 };

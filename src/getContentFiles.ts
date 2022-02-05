@@ -2,7 +2,7 @@ import { readdirSync, statSync } from "fs";
 import { join } from "path";
 
 export const getContentFiles = (contentDir: string) => {
-  const contentFiles = new Array<string>();
+  const contentFiles = new Set<string>();
 
   const paths = readdirSync(contentDir).map((p) => join(contentDir, p));
 
@@ -12,7 +12,7 @@ export const getContentFiles = (contentDir: string) => {
     if (stat.isDirectory()) {
       paths.push(...readdirSync(path).map((p) => join(path, p)));
     } else if (stat.isFile() && path.endsWith(".html")) {
-      contentFiles.push(path);
+      contentFiles.add(path);
     }
   }
 

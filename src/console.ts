@@ -49,6 +49,11 @@ export function error(...message: Array<any>): void {
       ),
     ].join(" ") + EOL
   );
+  process.exit(1);
+}
+
+export function warn(message: string): void {
+  console.warn(message);
 }
 
 export function log(message: string): void;
