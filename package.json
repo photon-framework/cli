@@ -28,7 +28,7 @@
     "@parcel/core": "^2.2.1",
     "@parcel/reporter-dev-server": "^2.2.1",
     "@parcel/resolver-default": "^2.2.1",
-    "@frank-mayer/dom-serializer": "^2.0.1",
+    "@frank-mayer/dom-serializer": "^2.0.2",
     "domhandler": "^4.3.0",
     "domutils": "^2.8.0",
     "htmlparser2": "^7.2.0"

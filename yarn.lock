@@ -205,10 +205,10 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
-"@frank-mayer/dom-serializer@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@frank-mayer/dom-serializer/-/dom-serializer-2.0.1.tgz#f7f97de50a98ac23e4a0ace988c3b13d1c636de5"
-  integrity sha512-LUUPgxZAfq7trtnAWmNRBAYRpmAmVBDPwdI2aFPgYLud63z9MJTTtseIJxv3w/giYnRqfIfJwgMAcJ+XbhqGlw==
+"@frank-mayer/dom-serializer@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@frank-mayer/dom-serializer/-/dom-serializer-2.0.2.tgz#159492e2ed696831a3036c986b3d88238c775491"
+  integrity sha512-IOWi4xD5OwsT/1q5O+MWEFqIo6IOuT+tpIUfX4fkezoxN2OzSnoqePlXeAgY0+T9Fr2UHZmdbpSQJn7GUOIRyg==
   dependencies:
     domelementtype "^2.2.0"
     domhandler "^4.3.0"

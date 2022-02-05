@@ -18,7 +18,8 @@ const ensureRuntimeIncluded = (dom: Document) => {
       (el) =>
         el.name === "script" &&
         "src" in el.attribs &&
-        el.attribs["src"]!.endsWith("photon-re/core.js"),
+        (el.attribs["src"]!.endsWith("photon-re/core.js") ||
+          el.attribs["src"]!.endsWith("photon-re/core.ts")),
       dom.childNodes
     )
   ) {
