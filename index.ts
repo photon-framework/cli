@@ -27,7 +27,7 @@ try {
     clearDirectory(dirs.distDir);
   }
 
-  if (settings.noCache || settings.clean) {
+  if ((settings.noCache || settings.clean) && existsSync(dirs.cacheDir)) {
     log(`clearing "${dirs.cacheDir}"...`);
     clearDirectory(dirs.cacheDir);
   }
