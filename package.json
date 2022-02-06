@@ -7,10 +7,11 @@
   },
   "scripts": {
     "build": "yarn run parcel build \"./index.ts\" --no-source-maps",
-    "test": "yarn run build && node ./index.js \"../homepage/src/\"",
-    "deploy": "yarn run build && yarn publish --access public"
+    "envnode": "echo \"#! /usr/bin/env node\n$(cat index.js)\" > index.js",
+    "test": "node ./index.js \"../homepage/src/\"",
+    "deploy": "yarn publish --access public"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
