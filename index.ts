@@ -9,6 +9,7 @@ import { log, error, cc } from "./src/console.js";
 import { clearDirectory } from "./src/clearDirectory.js";
 import { findTemplatesInContentFiles } from "./src/findTemplatesInContentFiles.js";
 import { getDOM } from "./src/fileWrapper.js";
+import { settings } from "./src/settings.js";
 import { Parcel } from "@parcel/core";
 import { existsSync } from "fs";
 
@@ -21,9 +22,14 @@ try {
     error(`"${dirs.sourceIndex}" does not exist`);
   }
 
-  if (existsSync(dirs.distDir)) {
+  if (settings.clean && existsSync(dirs.distDir)) {
     log(`clearing "${dirs.distDir}"...`);
     clearDirectory(dirs.distDir);
+  }
+
+  if (settings.noCache || settings.clean) {
+    log(`clearing "${dirs.cacheDir}"...`);
+    clearDirectory(dirs.cacheDir);
   }
 
   // Get options from router attributes
