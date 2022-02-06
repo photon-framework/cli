@@ -4,7 +4,7 @@ import { join } from "path";
 import { findOne } from "domutils";
 import type { Document } from "domhandler";
 
-const tailingOrLeadingSlash = new RegExp("^[\\/\\\\]|[\\/\\\\]$", "g");
+const tailingOrLeadingSlash = new RegExp("^[\\/\\\\]|[\\/\\\\]$");
 
 export type routerOptions = {
   contentDir: string;

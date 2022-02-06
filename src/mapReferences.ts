@@ -5,6 +5,8 @@ import { parseDocument } from "htmlparser2";
 import { readFileSync } from "fs";
 import { join } from "path";
 
+const placeholder = new RegExp("\\{\\{([^\\{\\}]+)\\}\\}", "g");
+
 export const mapReferences = (dom: Document, workingDir: string) => {
   for (const el of findAll(
     (el) => el.tagName === "photon-ref" && "src" in el.attribs,
@@ -22,7 +24,7 @@ export const mapReferences = (dom: Document, workingDir: string) => {
     replaceElement(
       el,
       parseDocument(
-        html.replace(/\{\{[^{}]+\}\}/g, (match) => {
+        html.replace(placeholder, (match) => {
           const key = match.substring(2, match.length - 2);
 
           if (dataset.has(key)) {

@@ -12,6 +12,8 @@ import type { Document, Element } from "domhandler";
 
 const routerEmoji: string = "";
 
+const leadingSlash = new RegExp("^[\\/\\\\]");
+
 const readDomFromContentFileDirs = (
   dirs: sourceDirsObj,
   routerOptions: routerOptions,
@@ -20,7 +22,7 @@ const readDomFromContentFileDirs = (
   new Map(
     Array.from(contentFilesDirs).map((dir) => {
       const relativePath = relative(routerOptions.contentDir, dir).replace(
-        /^[\/\\]/,
+        leadingSlash,
         ""
       );
 
