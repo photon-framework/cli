@@ -9,7 +9,7 @@
     "build": "tsc -p ./tsconfig.json",
     "test": "tsc -p ./tsconfig.json && node ./index.js \"../homepage/src/\""
   },
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
@@ -24,11 +24,11 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "@frank-mayer/dom-serializer": "^2.0.2",
     "@parcel/config-default": "^2.2.1",
     "@parcel/core": "^2.2.1",
     "@parcel/reporter-dev-server": "^2.2.1",
     "@parcel/resolver-default": "^2.2.1",
-    "@frank-mayer/dom-serializer": "^2.0.2",
     "domhandler": "^4.3.0",
     "domutils": "^2.8.0",
     "htmlparser2": "^7.2.0"
