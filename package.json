@@ -10,7 +10,7 @@
     "test": "yarn run build && node ./index.js \"../homepage/src/\"",
     "deploy": "yarn run build && yarn publish --access public"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
