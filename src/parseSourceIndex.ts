@@ -4,6 +4,8 @@ import { join } from "path";
 import { findOne } from "domutils";
 import type { Document } from "domhandler";
 
+const tailingOrLeadingSlash = new RegExp("^[\\/\\\\]|[\\/\\\\]$", "g");
+
 export type routerOptions = {
   contentDir: string;
   defaultSite: string;
@@ -58,12 +60,12 @@ const getRouterOptions = (dom: Document, dirs: sourceDirsObj) => {
 
   if (routerOptions.defaultSite) {
     routerOptions.defaultSite = routerOptions.defaultSite.replace(
-      /^[\/\\]|[\/\\]$/,
+      tailingOrLeadingSlash,
       ""
     );
 
     routerOptions.fallbackSite = routerOptions.fallbackSite
-      ? routerOptions.fallbackSite.replace(/^[\/\\]|[\/\\]$/, "")
+      ? routerOptions.fallbackSite.replace(tailingOrLeadingSlash, "")
       : routerOptions.defaultSite;
   } else {
     error("data-default-site attribute is required for router");
