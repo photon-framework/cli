@@ -1,5 +1,5 @@
-import type { sourceDirsObj } from "./sourceDirs.js";
-import { error, log } from "./console.js";
+import type { sourceDirsObj } from "./sourceDirs";
+import { error, log } from "./console";
 import { join } from "path";
 import { findOne } from "domutils";
 import type { Document } from "domhandler";

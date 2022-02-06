@@ -1,0 +1,7 @@
+.parcel-cache
+node_modules
+.gitattributes
+.gitignore
+*.ts
+tsconfig.json
+yarn.lock

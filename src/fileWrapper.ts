@@ -1,10 +1,10 @@
-import { domRenderOptions } from "./domRenderOptions.js";
+import { domRenderOptions } from "./domRenderOptions";
 import { parseDocument } from "htmlparser2";
 import { readFileSync, writeFileSync } from "fs";
 import { join, relative } from "path";
 import { render } from "@frank-mayer/dom-serializer";
 import type { Document } from "domhandler";
-import type { sourceDirsObj } from "./sourceDirs.js";
+import type { sourceDirsObj } from "./sourceDirs";
 
 const DOMcache = new Map<string, Document>();
 

@@ -1,5 +1,5 @@
-import type { sourceDirsObj } from "./sourceDirs.js";
-import { getDOM } from "./fileWrapper.js";
+import type { sourceDirsObj } from "./sourceDirs";
+import { getDOM } from "./fileWrapper";
 import type { Document } from "domhandler";
 import { findAll } from "domutils";
 import { join } from "path";

@@ -1,5 +1,5 @@
-import type { sourceDirsObj } from "./sourceDirs.js";
-import { settings } from "./settings.js";
+import type { sourceDirsObj } from "./sourceDirs";
+import { settings } from "./settings";
 import type { InitialParcelOptions } from "@parcel/types";
 
 export const parcelOptions = (

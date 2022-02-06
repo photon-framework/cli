@@ -1,15 +1,15 @@
 const [, , ...args] = process.argv;
 
-import { sourceDirs } from "./src/sourceDirs.js";
-import { parseSourceIndex } from "./src/parseSourceIndex.js";
-import { parcelOptions } from "./src/parcelOptions.js";
-import { findContentFilesInSource } from "./src/findContentFilesInSource.js";
-import { createStaticFiles } from "./src/createStaticFiles.js";
-import { log, error, cc } from "./src/console.js";
-import { clearDirectory } from "./src/clearDirectory.js";
-import { findTemplatesInContentFiles } from "./src/findTemplatesInContentFiles.js";
-import { getDOM } from "./src/fileWrapper.js";
-import { settings } from "./src/settings.js";
+import { sourceDirs } from "./src/sourceDirs";
+import { parseSourceIndex } from "./src/parseSourceIndex";
+import { parcelOptions } from "./src/parcelOptions";
+import { findContentFilesInSource } from "./src/findContentFilesInSource";
+import { createStaticFiles } from "./src/createStaticFiles";
+import { log, error, cc } from "./src/console";
+import { clearDirectory } from "./src/clearDirectory";
+import { findTemplatesInContentFiles } from "./src/findTemplatesInContentFiles";
+import { getDOM } from "./src/fileWrapper";
+import { settings } from "./src/settings";
 import { Parcel } from "@parcel/core";
 import { existsSync } from "fs";
 

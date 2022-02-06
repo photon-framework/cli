@@ -1,4 +1,4 @@
-import { log } from "./console.js";
+import { log } from "./console";
 
 export const settings = {
   noCache: process.argv.includes("--no-cache"),

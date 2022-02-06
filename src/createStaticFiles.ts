@@ -1,10 +1,10 @@
-import type { sourceDirsObj } from "./sourceDirs.js";
-import type { routerOptions } from "./parseSourceIndex.js";
-import { mapRoutingAnchors } from "./mapRoutingAnchors.js";
-import { mapReferences } from "./mapReferences.js";
-import { error, log } from "./console.js";
-import { exportDOM, getDOM, sourceToDist } from "./fileWrapper.js";
-import { createSitemap } from "./createSitemap.js";
+import type { sourceDirsObj } from "./sourceDirs";
+import type { routerOptions } from "./parseSourceIndex";
+import { mapRoutingAnchors } from "./mapRoutingAnchors";
+import { mapReferences } from "./mapReferences";
+import { error, log } from "./console";
+import { exportDOM, getDOM, sourceToDist } from "./fileWrapper";
+import { createSitemap } from "./createSitemap";
 import { existsSync, mkdirSync, writeFileSync, copyFileSync } from "fs";
 import { relative, join } from "path";
 import { findOne } from "domutils";

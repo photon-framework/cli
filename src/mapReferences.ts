@@ -1,4 +1,4 @@
-import { warn } from "./console.js";
+import { warn } from "./console";
 import type { Document } from "domhandler";
 import { findAll, replaceElement } from "domutils";
 import { parseDocument } from "htmlparser2";
