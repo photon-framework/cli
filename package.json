@@ -36,7 +36,7 @@
     "htmlparser2": "^7.2.0"
   },
   "devDependencies": {
-    "parcel": "^2.2.1",
+    "parcel": "^2.3.0",
     "typescript": "^4.6.0-dev.20220204"
   }
 }
