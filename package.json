@@ -37,6 +37,6 @@
   },
   "devDependencies": {
     "parcel": "^2.2.1",
-    "typescript": "^4.6.0-dev.20220204"
+    "typescript": "^4.6.0-dev.20220209"
   }
 }
