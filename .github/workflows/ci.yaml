@@ -14,8 +14,9 @@ jobs:
           cache: "yarn"
           registry-url: "https://registry.npmjs.org"
       - run: yarn
-      - run: yarn run parcel build \"./index.ts\" --no-source-maps
-      - run: echo \"#! /usr/bin/env node\\n\" > index.temp && cat index.js >> index.temp
+      - run: yarn run parcel build "./index.ts" --no-source-maps
+      - run: echo "#! /usr/bin/env node" > index.temp
+      - run: cat index.js >> index.temp
       - run: mv index.temp index.js
       - uses: JS-DevTools/npm-publish@v1
         with:
