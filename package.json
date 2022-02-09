@@ -25,11 +25,13 @@
   "author": "Frank Mayer <frank.mayer1907@protonmail.com>",
   "license": "MIT",
   "private": false,
+  "dependencies": {
+    "@parcel/core": "^2.3.0",
+    "@parcel/config-default": "^2.3.0"
+  },
   "devDependencies": {
     "parcel": "^2.3.0",
     "@frank-mayer/dom-serializer": "^2.0.2",
-    "@parcel/config-default": "^2.3.0",
-    "@parcel/core": "^2.3.0",
     "@parcel/reporter-dev-server": "^2.3.0",
     "@parcel/resolver-default": "^2.3.0",
     "domhandler": "^4.3.0",
