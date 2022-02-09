@@ -28,7 +28,7 @@
   "dependencies": {
     "@frank-mayer/dom-serializer": "^2.0.2",
     "@parcel/config-default": "^2.2.1",
-    "@parcel/core": "^2.2.1",
+    "@parcel/core": "^2.3.0",
     "@parcel/reporter-dev-server": "^2.2.1",
     "@parcel/resolver-default": "^2.2.1",
     "domhandler": "^4.3.0",
