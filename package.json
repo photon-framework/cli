@@ -11,7 +11,7 @@
     "test": "node ./index.js \"../homepage/src/\"",
     "deploy": "yarn publish --access public"
   },
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
@@ -27,16 +27,16 @@
   "private": false,
   "dependencies": {
     "@frank-mayer/dom-serializer": "^2.0.2",
-    "@parcel/config-default": "^2.2.1",
-    "@parcel/core": "^2.2.1",
-    "@parcel/reporter-dev-server": "^2.2.1",
-    "@parcel/resolver-default": "^2.2.1",
+    "@parcel/config-default": "^2.3.0",
+    "@parcel/core": "^2.3.0",
+    "@parcel/reporter-dev-server": "^2.3.0",
+    "@parcel/resolver-default": "^2.3.0",
     "domhandler": "^4.3.0",
     "domutils": "^2.8.0",
     "htmlparser2": "^7.2.0"
   },
   "devDependencies": {
-    "parcel": "^2.2.1",
-    "typescript": "^4.6.0-dev.20220204"
+    "parcel": "^2.3.0",
+    "typescript": "^4.6.0-dev.20220209"
   }
 }
