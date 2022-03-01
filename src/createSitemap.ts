@@ -1,5 +1,3 @@
-import type { Document } from "domhandler";
-
 const createSitemapUrl = (
   xml: Array<string>,
   loc: string,
@@ -13,10 +11,9 @@ const createSitemapUrl = (
   xml.push("</url>");
 };
 
-export const createSitemap = (
-  contentFiles: Map<string, Document>,
-  canonical: string
-) => {
+export const createSitemap = (paths: Iterable<string>, canonical: string) => {
+  console.log("Creating Sitemap");
+
   const date = new Date().toISOString().split("T")[0]!;
 
   const xml = [
@@ -25,7 +22,7 @@ export const createSitemap = (
   ];
 
   createSitemapUrl(xml, `${canonical}/`, date, 1);
-  for (const path of contentFiles.keys()) {
+  for (const path of paths) {
     createSitemapUrl(xml, `${canonical}/${path}`, date, 0.75);
   }
 
