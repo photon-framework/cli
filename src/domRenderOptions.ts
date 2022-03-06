@@ -1,3 +1,3 @@
-export const domRenderOptions = {
+export const domRenderOptions = Object.freeze({
   selfClosingTags: true,
-};
+});

@@ -1,13 +1,13 @@
 import { statSync, existsSync } from "fs";
 import { join, resolve, dirname, normalize } from "path";
 
-export type sourceDirsObj = {
+export type SourceDirsObj = Readonly<{
   distDir: string;
   distIndex: string;
   contentDir: string;
-};
+}>;
 
-export const getDirs = (args: Iterable<string>): sourceDirsObj => {
+export const getDirs = (args: Iterable<string>): SourceDirsObj => {
   let distIndex: string | undefined = undefined;
 
   const distDir = normalize(
@@ -31,9 +31,9 @@ export const getDirs = (args: Iterable<string>): sourceDirsObj => {
 
   distIndex ??= join(distDir, "index.html");
 
-  return {
+  return Object.freeze({
     distDir,
     distIndex,
     contentDir: join(distDir, "content"),
-  };
+  });
 };

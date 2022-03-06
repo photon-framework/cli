@@ -1,8 +1,10 @@
 const [, , ...args] = process.argv;
 
 import { getDirs } from "./src/getDirs";
+import type { SourceDirsObj } from "./src/getDirs";
 import { exportDOM, getDOM } from "./src/fileWrapper";
 import { getRouterOptions } from "./src/routerOptions";
+import type { RouterOptions } from "./src/routerOptions";
 import { getContentPathsList } from "./src/getContentPathsList";
 import { findRouterEl } from "./src/findRouterEl";
 import { writeRoute } from "./src/writeRoute";
@@ -14,12 +16,12 @@ import { existsSync, writeFileSync } from "fs";
 import { findAll } from "domutils";
 
 // Get directories and index file
-const dirs = getDirs(args);
+const dirs: SourceDirsObj = getDirs(args);
 const contentFiles = getContentPathsList(dirs);
 
 // Prerendered Pages
 const sourceDom = resolveTemplates(getDOM(dirs.distIndex), dirs.distDir);
-const routerOptions = getRouterOptions(sourceDom);
+const routerOptions: RouterOptions = getRouterOptions(sourceDom);
 const routerEl = findRouterEl(sourceDom);
 const contentPaths = new Set<string>();
 
@@ -36,7 +38,7 @@ for (const contentPath of contentFiles) {
     continue;
   }
   contentPaths.add(route);
-  writeRoute(sourceDom, routerEl, dirs.distDir, route, content);
+  writeRoute(sourceDom, routerEl, dirs.distDir, route, content, routerOptions);
 }
 
 {
@@ -49,6 +51,7 @@ for (const contentPath of contentFiles) {
     dirs.distDir,
     "/",
     content,
+    routerOptions,
     routerOptions.defaultSite
   );
 }
@@ -58,7 +61,14 @@ if (routerOptions.fallbackSite !== routerOptions.defaultSite) {
   const content = getDOM(
     join(dirs.contentDir, routerOptions.fallbackSite + ".html")
   );
-  writeRoute(sourceDom, routerEl, dirs.distDir, "/404.html", content);
+  writeRoute(
+    sourceDom,
+    routerEl,
+    dirs.distDir,
+    "/404.html",
+    content,
+    routerOptions
+  );
 }
 
 // sitemap.xml

@@ -4,14 +4,15 @@ import { findRouterEl } from "./findRouterEl";
 
 const tailingOrLeadingSlash = new RegExp("^[\\/\\\\]|[\\/\\\\]$");
 
-export type routerOptions = {
+export type RouterOptions = Readonly<{
   contentDir: string;
   defaultSite: string;
   fallbackSite: string;
+  langSegment: number;
   canonical: string | undefined;
-};
+}>;
 
-export const getRouterOptions = (dom: Document): routerOptions => {
+export const getRouterOptions = (dom: Document): RouterOptions => {
   const nodes = dom.childNodes;
 
   const canonical = findOne(
@@ -26,9 +27,10 @@ export const getRouterOptions = (dom: Document): routerOptions => {
   const routerEl = findRouterEl(dom);
 
   const routerOptions = {
-    contentDir: routerEl!.attribs["data-content"] as string,
-    defaultSite: routerEl!.attribs["data-default"] as string,
-    fallbackSite: routerEl!.attribs["data-fallback"] as string,
+    contentDir: routerEl.attribs["data-content"] as string,
+    defaultSite: routerEl.attribs["data-default"] as string,
+    fallbackSite: routerEl.attribs["data-fallback"] as string,
+    langSegment: Number(routerEl.attribs["data-lang-segment"]),
     canonical: canonical ? canonical.attribs["href"] : undefined,
   };
 
@@ -47,5 +49,5 @@ export const getRouterOptions = (dom: Document): routerOptions => {
 
   console.log("Router options:", routerOptions);
 
-  return routerOptions;
+  return Object.freeze(routerOptions);
 };

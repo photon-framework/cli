@@ -1,8 +1,8 @@
 import { readdirSync, statSync } from "fs";
 import { join } from "path";
-import { sourceDirsObj } from "./getDirs";
+import { SourceDirsObj } from "./getDirs";
 
-export const getContentPathsList = (dirs: sourceDirsObj) => {
+export const getContentPathsList = (dirs: SourceDirsObj) => {
   const contentPaths = new Set<string>();
 
   const searchPaths = [dirs.contentDir];
