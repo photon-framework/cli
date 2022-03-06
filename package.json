@@ -11,7 +11,7 @@
     "test": "node ./index.js \"../homepage/dist/\"",
     "deploy": "yarn publish --access public"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
