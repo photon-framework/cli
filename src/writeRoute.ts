@@ -1,11 +1,11 @@
 import { exportDOM } from "./fileWrapper";
 import type { Document, Element, NodeWithChildren } from "domhandler";
-import { dirname, join, normalize } from "path";
+import { dirname, join, normalize, resolve } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { resolveTemplates } from "./resolveTemplates";
 import type { RouterOptions } from "./routerOptions";
 import { getLangFromPath } from "./getLangFromPath";
-import { findOne } from "domutils";
+import { findAll, findOne } from "domutils";
 
 const routerEmoji: string = "";
 
@@ -37,6 +37,17 @@ export const writeRoute = (
         htmlEl.attribs["lang"] = lang;
       }
     }
+  }
+
+  const anchors = findAll(
+    (el) => el.tagName === "a" && "data-route" in el.attribs,
+    dom.childNodes
+  );
+  for (const a of anchors) {
+    a.attribs.href = resolve(
+      routerEl.attribs["data-route"],
+      a.attribs["data-route"]!
+    );
   }
 
   if (route.endsWith(".html")) {
