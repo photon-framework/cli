@@ -50,6 +50,30 @@ export const writeRoute = (
     );
   }
 
+  if (routerOptions.canonical) {
+    const canonicalEl = findOne(
+      (el) =>
+        el.tagName === "link" &&
+        "rel" in el.attribs &&
+        el.attribs.rel === "canonical",
+      dom.childNodes
+    );
+    if (canonicalEl) {
+      let canonical = routerOptions.canonical;
+      if (!canonical.endsWith("/")) {
+        canonical += "/";
+      }
+
+      if (dataRoute.startsWith("/")) {
+        canonical += dataRoute.substring(1);
+      } else {
+        canonical += dataRoute;
+      }
+
+      canonicalEl.attribs.href = canonical;
+    }
+  }
+
   if (route.endsWith(".html")) {
     const distPath = join(rootPath, route);
     const distDir = dirname(distPath);
