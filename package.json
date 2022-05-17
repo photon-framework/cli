@@ -32,7 +32,7 @@
     "htmlparser2": "^7.2.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.22",
+    "@types/node": "^17.0.34",
     "parcel": "^2.3.2",
     "typescript": "^4.6.2"
   }
