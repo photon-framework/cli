@@ -1,3 +1,5 @@
+import { ensurePosixPath } from "./ensurePosixPath";
+
 const createSitemapUrl = (
   xml: Array<string>,
   loc: string,
@@ -14,6 +16,10 @@ const createSitemapUrl = (
 export const createSitemap = (paths: Iterable<string>, canonical: string) => {
   console.log("Creating Sitemap");
 
+  while (canonical.endsWith("/")) {
+    canonical = canonical.slice(0, -1);
+  }
+
   const date = new Date().toISOString().split("T")[0]!;
 
   const xml = [
@@ -23,7 +29,7 @@ export const createSitemap = (paths: Iterable<string>, canonical: string) => {
 
   createSitemapUrl(xml, `${canonical}/`, date, 1);
   for (const path of paths) {
-    createSitemapUrl(xml, `${canonical}/${path}`, date, 0.75);
+    createSitemapUrl(xml, `${canonical}/${ensurePosixPath(path)}`, date, 0.75);
   }
 
   xml.push("</urlset>");

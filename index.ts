@@ -12,6 +12,7 @@ import { createSitemap } from "./src/createSitemap";
 import { createRobots } from "./src/createRobots";
 import { resolveTemplates, templateCache } from "./src/resolveTemplates";
 import { dirname, join, relative } from "path";
+import { normalize } from "path/posix";
 import { existsSync, writeFileSync } from "fs";
 import { findAll } from "domutils";
 
@@ -37,7 +38,7 @@ for (const contentPath of contentFiles) {
   if (route === routerOptions.fallbackSite) {
     continue;
   }
-  contentPaths.add(route);
+  contentPaths.add(normalize(route));
   writeRoute(sourceDom, routerEl, dirs.distDir, route, content, routerOptions);
 }
 
@@ -90,7 +91,7 @@ if (routerOptions.canonical && !existsSync(robotsPath)) {
     createRobots(
       contentPaths,
       Array.from(templateCache.keys()).map((path) =>
-        relative(dirs.distDir, path)
+        normalize(relative(dirs.distDir, path))
       ),
       sitemapPresent ? join(routerOptions.canonical, "/sitemap.xml") : undefined
     )

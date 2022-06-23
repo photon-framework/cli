@@ -1,4 +1,5 @@
 import { EOL } from "os";
+import { ensurePosixPath } from "./ensurePosixPath";
 
 export const createRobots = (
   pathsAllow: Iterable<string>,
@@ -15,15 +16,15 @@ export const createRobots = (
   ];
 
   for (const path of pathsDisallow) {
-    robots.push(`Disallow: /${path}`);
+    robots.push(`Disallow: /${ensurePosixPath(path)}`);
   }
 
   for (const path of pathsAllow) {
-    robots.push(`Allow: /${path}`);
+    robots.push(`Allow: /${ensurePosixPath(path)}`);
   }
 
   if (sitemap) {
-    robots.push("Sitemap: " + sitemap);
+    robots.push("Sitemap: " + ensurePosixPath(sitemap));
   }
 
   return robots.join(EOL) + EOL;
