@@ -9,9 +9,9 @@
     "build": "yarn run parcel build \"./index.ts\" --no-source-maps",
     "envnode": "echo \"#! /usr/bin/env node\\n\" > index.temp && cat index.js >> index.temp && mv index.temp index.js",
     "test": "node ./index.js \"../homepage/dist/\"",
-    "deploy": "yarn publish --access public"
+    "deploy": "yarn npm publish --access public"
   },
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
@@ -24,7 +24,6 @@
   "homepage": "https://github.com/photon-framework",
   "author": "Frank Mayer <frank.mayer1907@protonmail.com>",
   "license": "MIT",
-  "private": false,
   "dependencies": {
     "@frank-mayer/dom-serializer": "^2.0.2",
     "domhandler": "^4.3.0",
