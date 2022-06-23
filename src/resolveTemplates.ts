@@ -1,29 +1,29 @@
 import { NodeWithChildren } from "domhandler";
 import { findAll, replaceElement } from "domutils";
-import { readFileSync } from "fs";
 import { parseDocument } from "htmlparser2";
 import { join, normalize } from "path";
+import { readProcessedHtmlString } from "./readProcessedHtmlString";
 
 const placeholder = new RegExp("\\{\\{([^\\{\\}]+)\\}\\}", "g");
 
 export const templateCache = new Map<string, string>();
 
-const loadTemplate = (file: string): string => {
+const loadTemplate = async (file: string): Promise<string> => {
   file = normalize(file);
 
   if (templateCache.has(file)) {
     return templateCache.get(file)!;
   }
 
-  const template = readFileSync(file).toString();
+  const template = await readProcessedHtmlString(file);
   templateCache.set(file, template);
   return template;
 };
 
-export const resolveTemplates = <TNode extends NodeWithChildren>(
+export const resolveTemplates = async <TNode extends NodeWithChildren>(
   node: TNode,
   rootPath: string
-): TNode => {
+): Promise<TNode> => {
   const photonRefElements = findAll(
     (el) => el.name === "photon-ref" && "src" in el.attribs,
     node.childNodes
@@ -37,7 +37,9 @@ export const resolveTemplates = <TNode extends NodeWithChildren>(
       }
     }
 
-    const html = loadTemplate(join(rootPath, photonRefEl.attribs["src"]!));
+    const html = await loadTemplate(
+      join(rootPath, photonRefEl.attribs["src"]!)
+    );
 
     replaceElement(
       photonRefEl,

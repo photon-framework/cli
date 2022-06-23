@@ -9,7 +9,7 @@ import { findAll, findOne } from "domutils";
 
 const routerEmoji: string = "";
 
-export const writeRoute = (
+export const writeRoute = async (
   dom: Document,
   routerEl: Element,
   rootPath: string,
@@ -20,7 +20,7 @@ export const writeRoute = (
 ) => {
   console.log(routerEmoji, route);
 
-  routerEl.children = [resolveTemplates(content, rootPath)];
+  routerEl.children = [await resolveTemplates(content, rootPath)];
 
   routerEl.attribs["data-route"] = normalize("/" + dataRoute);
 

@@ -1,20 +1,24 @@
 import { domRenderOptions } from "./domRenderOptions";
 import { parseDocument } from "htmlparser2";
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync } from "fs";
 import { render } from "@frank-mayer/dom-serializer";
 import type { Document } from "domhandler";
 import { normalize } from "path";
+import { readProcessedHtmlString } from "./readProcessedHtmlString";
 
 const DOMcache = new Map<string, Document>();
 
-export const getDOM = (file: string, useCache: boolean = true): Document => {
+export const getDOM = async (
+  file: string,
+  useCache: boolean = true
+): Promise<Document> => {
   file = normalize(file);
 
   if (useCache && DOMcache.has(file)) {
     return DOMcache.get(file)!;
   }
 
-  const dom = parseDocument(readFileSync(file).toString());
+  const dom = parseDocument(await readProcessedHtmlString(file));
   DOMcache.set(file, dom);
   return dom;
 };
