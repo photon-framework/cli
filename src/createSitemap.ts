@@ -1,4 +1,4 @@
-import { ensurePosixPath } from "./ensurePosixPath";
+import { ensureWebPath } from "./ensureWebPath";
 
 const createSitemapUrl = (
   xml: Array<string>,
@@ -29,7 +29,7 @@ export const createSitemap = (paths: Iterable<string>, canonical: string) => {
 
   createSitemapUrl(xml, `${canonical}/`, date, 1);
   for (const path of paths) {
-    createSitemapUrl(xml, `${canonical}/${ensurePosixPath(path)}`, date, 0.75);
+    createSitemapUrl(xml, `${canonical}/${ensureWebPath(path)}`, date, 0.75);
   }
 
   xml.push("</urlset>");

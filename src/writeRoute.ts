@@ -1,13 +1,12 @@
 import { exportDOM } from "./fileWrapper";
 import type { Document, Element, NodeWithChildren } from "domhandler";
-import { dirname, join } from "path";
-import { normalize, resolve } from "path/posix";
+import { dirname, join, normalize, resolve } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { resolveTemplates } from "./resolveTemplates";
 import type { RouterOptions } from "./routerOptions";
 import { getLangFromPath } from "./getLangFromPath";
 import { findAll, findOne } from "domutils";
-import { ensurePosixPath } from "./ensurePosixPath";
+import { ensureWebPath } from "./ensureWebPath";
 
 const routerEmoji: string = "";
 
@@ -20,7 +19,7 @@ export const writeRoute = (
   routerOptions: RouterOptions,
   dataRoute: string = route
 ) => {
-  console.log(routerEmoji, ensurePosixPath(route));
+  console.log(routerEmoji, ensureWebPath(route));
 
   routerEl.children = [resolveTemplates(content, rootPath)];
 

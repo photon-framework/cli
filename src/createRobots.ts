@@ -1,5 +1,5 @@
 import { EOL } from "os";
-import { ensurePosixPath } from "./ensurePosixPath";
+import { ensureWebPath } from "./ensureWebPath";
 
 export const createRobots = (
   pathsAllow: Iterable<string>,
@@ -16,15 +16,15 @@ export const createRobots = (
   ];
 
   for (const path of pathsDisallow) {
-    robots.push(`Disallow: /${ensurePosixPath(path)}`);
+    robots.push(`Disallow: /${ensureWebPath(path)}`);
   }
 
   for (const path of pathsAllow) {
-    robots.push(`Allow: /${ensurePosixPath(path)}`);
+    robots.push(`Allow: /${ensureWebPath(path)}`);
   }
 
   if (sitemap) {
-    robots.push("Sitemap: " + ensurePosixPath(sitemap));
+    robots.push("Sitemap: " + ensureWebPath(sitemap));
   }
 
   return robots.join(EOL) + EOL;

@@ -11,10 +11,10 @@ import { writeRoute } from "./src/writeRoute";
 import { createSitemap } from "./src/createSitemap";
 import { createRobots } from "./src/createRobots";
 import { resolveTemplates, templateCache } from "./src/resolveTemplates";
-import { dirname, join, relative } from "path";
-import { normalize } from "path/posix";
+import { dirname, join, relative, normalize } from "path";
 import { existsSync, writeFileSync } from "fs";
 import { findAll } from "domutils";
+import { ensureWebPath } from "./src/ensureWebPath";
 
 // Get directories and index file
 const dirs: SourceDirsObj = getDirs(args);
@@ -38,7 +38,7 @@ for (const contentPath of contentFiles) {
   if (route === routerOptions.fallbackSite) {
     continue;
   }
-  contentPaths.add(normalize(route));
+  contentPaths.add(ensureWebPath(normalize(route)));
   writeRoute(sourceDom, routerEl, dirs.distDir, route, content, routerOptions);
 }
 
@@ -86,6 +86,7 @@ if (!sitemapPresent && routerOptions.canonical) {
 // robots.txt
 const robotsPath = join(dirs.distDir, "robots.txt");
 if (routerOptions.canonical && !existsSync(robotsPath)) {
+  console.debug("routerOptions.canonical", routerOptions.canonical);
   writeFileSync(
     robotsPath,
     createRobots(
@@ -93,7 +94,7 @@ if (routerOptions.canonical && !existsSync(robotsPath)) {
       Array.from(templateCache.keys()).map((path) =>
         normalize(relative(dirs.distDir, path))
       ),
-      sitemapPresent ? join(routerOptions.canonical, "/sitemap.xml") : undefined
+      sitemapPresent ? routerOptions.canonical + "/sitemap.xml" : undefined
     )
   );
 }
