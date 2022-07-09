@@ -107,9 +107,9 @@ export const serve = () => {
 
   const bundler = new Parcel({
     ...baseParcelOptions,
-    mode: "production",
+    mode: "development",
     env: {
-      NODE_ENV: "production",
+      NODE_ENV: "development",
     },
     serveOptions: {
       port: options.serve,
