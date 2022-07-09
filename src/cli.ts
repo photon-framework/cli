@@ -9,6 +9,7 @@ import {
 } from "fs";
 import { resolve, dirname } from "path";
 import { EOL } from "os";
+import { closeAllWindows } from "./windows";
 
 console.log(
   Color.magentaBright(`
@@ -53,6 +54,9 @@ const help = () => {
 Options:
     ${highlight("--path")}          -p    Specify input directory
     ${highlight("--source")}        -s    Specify source directory
+    ${highlight(
+      "--serve"
+    )}               Specify a port to host the app and watch for changes
     ${highlight("--help")}          -h    Show this help message
     ${highlight("--verbose")}       -v    Verbose output
     ${highlight("--no-robots")}           Disable generation of robots.txt
@@ -174,6 +178,7 @@ export const exit = (code: number = 0, message: string = "") => {
   if (crashGuardId) {
     clearInterval(crashGuardId);
   }
+  closeAllWindows();
 
   process.stdout.write("\x1b[2K\x1b[0G");
 
@@ -201,16 +206,29 @@ export const exit = (code: number = 0, message: string = "") => {
   process.exit(code);
 };
 
-let crashGuardId: NodeJS.Timeout | number | undefined;
-const crashGuard = () => {
+process.on("SIGINT", function () {
+  exit(0, "User interrupted");
+});
+
+let crashGuardId: NodeJS.Timeout | number | undefined = undefined;
+let crashGuard = () => {
   if (crashGuardId) {
     clearInterval(crashGuardId);
     crashGuardId = undefined;
   }
 
-  crashGuardId = setTimeout(() => {
-    exit(500, "Crash guard triggered (no response)");
-  }, 5000);
+  if (crashGuardId !== -1) {
+    crashGuardId = setTimeout(() => {
+      exit(500, "Crash guard triggered (no response)");
+    }, 30000);
+  }
+};
+export const stopCrashGuard = () => {
+  crashGuard = () => {};
+
+  if (crashGuardId) {
+    clearInterval(crashGuardId);
+  }
 };
 
 const throbberInterval = setInterval(() => {
@@ -248,6 +266,13 @@ export const options = (() => {
         lazyMultiple: false,
         multiple: false,
         type: String,
+      },
+      {
+        name: "serve",
+        lazyMultiple: false,
+        multiple: false,
+        type: Number,
+        defaultValue: false,
       },
       {
         name: "help",
@@ -305,6 +330,7 @@ export const options = (() => {
 })() as Readonly<{
   dist: string;
   source: string;
+  serve: number;
   help: boolean;
   verbose: boolean;
   "no-robots": boolean;
@@ -315,6 +341,8 @@ export const options = (() => {
 if (options.help) {
   help();
   exit();
+} else if (!isNaN(options.serve) && options.serve > 0 && !options.source) {
+  exit(400, "Source directory is required when serving");
 } else if (!options.dist) {
   help();
   exit(400, "No input directory specified, this option is required");

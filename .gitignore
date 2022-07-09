@@ -124,6 +124,9 @@ dist
 # DynamoDB Local files
 .dynamodb/
 
+# MariaDB
+*.mdb
+
 # TernJS port file
 .tern-port
 
