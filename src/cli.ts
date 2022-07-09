@@ -27,7 +27,12 @@ const artifactPath = process.argv[1];
 if (artifactPath && existsSync(artifactPath)) {
   console.log(Color.blackBright(`Artifact: ${artifactPath}`));
 
-  const packageJsonPath = join(dirname(artifactPath), "package.json");
+  const dname = dirname(artifactPath);
+
+  const packageJsonPath = dname.endsWith(".bin")
+    ? resolve(dname, "../photon-cli/package.json")
+    : resolve(dname, "package.json");
+
   if (existsSync(packageJsonPath)) {
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
     if ("version" in packageJson) {
