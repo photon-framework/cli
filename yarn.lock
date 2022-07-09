@@ -1035,6 +1035,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mustache@npm:^4.1.3":
+  version: 4.1.3
+  resolution: "@types/mustache@npm:4.1.3"
+  checksum: dd54ef4d26c3bb8389ed23590ec1cf23fcb51cf0d4d574dbabb294142c8d5bd3ce6d98ecc0fc9f91bcfd5e017b04e4aedac505989f51de22752caaffcc0ee352
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:^18.0.3":
   version: 18.0.3
   resolution: "@types/node@npm:18.0.3"
@@ -2565,6 +2572,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mustache@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "mustache@npm:4.2.0"
+  bin:
+    mustache: bin/mustache
+  checksum: 928fcb63e3aa44a562bfe9b59ba202cccbe40a46da50be6f0dd831b495be1dd7e38ca4657f0ecab2c1a89dc7bccba0885eab7ee7c1b215830da765758c7e0506
+  languageName: node
+  linkType: hard
+
 "negotiator@npm:^0.6.3":
   version: 0.6.3
   resolution: "negotiator@npm:0.6.3"
@@ -2817,10 +2833,12 @@ __metadata:
     "@types/cli-color": ^2.0.2
     "@types/command-line-args": ^5.2.0
     "@types/jsdom": ^16.2.14
+    "@types/mustache": ^4.1.3
     "@types/node": ^18.0.3
     cli-color: ^2.0.3
     command-line-args: ^5.2.1
     jsdom: ^20.0.0
+    mustache: ^4.2.0
     parcel: ^2.6.2
     typescript: ^4.7.4
   bin:
