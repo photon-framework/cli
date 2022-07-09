@@ -7,7 +7,7 @@ import {
   statSync,
   writeFileSync,
 } from "fs";
-import { resolve, dirname, join } from "path";
+import { resolve, dirname } from "path";
 import { EOL } from "os";
 
 console.log(

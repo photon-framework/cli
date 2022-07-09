@@ -1,6 +1,6 @@
 import { existsSync } from "fs";
 import { join } from "path";
-import { origin, serverUrl } from "./addInfo";
+import { serverUrl } from "./addInfo";
 import { log, logLevel, options } from "./cli";
 import { router } from "./router";
 import { filesIn } from "./tools";
