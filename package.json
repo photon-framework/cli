@@ -11,7 +11,7 @@
     "test": "node ./index.js \"../homepage/dist/\"",
     "deploy": "yarn npm publish --access public"
   },
-  "version": "0.4.3",
+  "version": "1.0.0",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "repository": {
@@ -25,14 +25,16 @@
   "author": "Frank Mayer <frank.mayer1907@protonmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@frank-mayer/dom-serializer": "^2.0.2",
-    "domhandler": "^4.3.0",
-    "domutils": "^2.8.0",
-    "htmlparser2": "^7.2.0"
+    "cli-color": "^2.0.3",
+    "command-line-args": "^5.2.1",
+    "jsdom": "^20.0.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.22",
-    "parcel": "^2.3.2",
-    "typescript": "^4.6.2"
+    "@types/cli-color": "^2.0.2",
+    "@types/command-line-args": "^5.2.0",
+    "@types/jsdom": "^16.2.14",
+    "@types/node": "^18.0.3",
+    "parcel": "^2.6.2",
+    "typescript": "^4.7.4"
   }
 }
