@@ -1,7 +1,10 @@
 {
   "name": "photon-cli",
   "displayName": "Photon CLI",
-  "type": "module",
+  "type": "commonjs",
+  "version": "1.0.0",
+  "description": "compiler for the photon web-framework",
+  "main": "index.js",
   "bin": {
     "photon": "./index.js"
   },
@@ -11,9 +14,6 @@
     "test": "node ./index.js \"../homepage/dist/\"",
     "deploy": "yarn npm publish --access public"
   },
-  "version": "1.0.0",
-  "description": "compiler for the photon web-framework",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/photon-framework/cli.git"

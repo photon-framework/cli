@@ -1,11 +1,15 @@
 import commandLineArgs from "command-line-args";
 import Color from "cli-color";
-import { appendFileSync, existsSync, statSync, writeFileSync } from "fs";
-import { resolve } from "path";
+import {
+  appendFileSync,
+  existsSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "fs";
+import { resolve, dirname, join } from "path";
 import { EOL } from "os";
 
-const version = "1.0.0";
-const artifactPath = process.argv[1];
 console.log(
   Color.magentaBright(`
     ___       ___       ___       ___       ___       ___
@@ -17,11 +21,21 @@ console.log(
              \\/__/     \\/__/               \\/__/     \\/__/
 `)
 );
-console.log(Color.blackBright(`Node.js: ${process.version}`));
+
+const artifactPath = process.argv[1];
+
 if (artifactPath && existsSync(artifactPath)) {
   console.log(Color.blackBright(`Artifact: ${artifactPath}`));
+
+  const packageJsonPath = join(dirname(artifactPath), "package.json");
+  if (existsSync(packageJsonPath)) {
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+    if ("version" in packageJson) {
+      console.log(Color.blackBright(`Photon CLI v${packageJson.version}`));
+    }
+  }
 }
-console.log(Color.blackBright(`Photon CLI v${version}`));
+console.log(Color.blackBright(`Node.js: ${process.version}`));
 console.log("");
 
 const highlight = Color.bold.underline.whiteBright;
@@ -32,15 +46,27 @@ const help = () => {
     $ photon-cli [options ...]
 
 Options:
-    ${highlight("--path")}    -p    Specify input directory
-    ${highlight("--help")}    -h    Show this help message
-    ${highlight("--version")} -v    Show version
+    ${highlight("--path")}          -p    Specify input directory
+    ${highlight("--help")}          -h    Show this help message
+    ${highlight("--verbose")}       -v    Verbose output
+    ${highlight("--no-robots")}           Disable generation of robots.txt
+    ${highlight("--no-sitemap")}          Disable generation of sitemap.xml
 `)
   );
 };
 
 const messageBuffer = new Array<{ throbber: string; list: string }>();
-const throbber = ["–", "\\", "|", "/"];
+const throbber = (() => {
+  const a = ["|", "/", "-", "\\"];
+  const b = new Array<string>();
+  for (let i = 0; i < a.length; i++) {
+    b.push(a[i]!);
+    b.push(a[i]!);
+    b.push(a[i]!);
+    b.push(a[i]!);
+  }
+  return b;
+})();
 let throbberIndex = 0;
 
 const locale = Intl.DateTimeFormat().resolvedOptions().locale;
@@ -49,29 +75,91 @@ const logFilePath = resolve("./photon.log");
   const [, , ...args] = process.argv;
   writeFileSync(
     logFilePath,
-    new Date().toISOString() + "\t[INFO]\tphoton-cli " + args.join(" ") + EOL,
+    new Date().toISOString() + "\t[INFO]  \tphoton-cli " + args.join(" ") + EOL,
     "utf8"
   );
 }
-const logFile = (message: string, channel: "INFO" | "WARN" | "ERROR") => {
+
+const logFile = (message: string, channel: string) => {
+  if (channel === logLevel.verbose && !options.verbose) {
+    return;
+  }
+
   const ts = new Date().toISOString();
-  appendFileSync(logFilePath, `${ts}\t[${channel}]\t${message}${EOL}`, "utf8");
+  const channelDisplay = `[${channel}]`.padEnd(9);
+  appendFileSync(
+    logFilePath,
+    `${ts}\t${channelDisplay}\t${message}${EOL}`,
+    "utf8"
+  );
 };
 
-export const log = (message: string) => {
+export enum logLevel {
+  verbose = "VERBOSE",
+  info = "INFO",
+  warn = "WARNING",
+  error = "ERROR",
+}
+
+export const log = (message: string, channel: logLevel = logLevel.info) => {
   crashGuard();
-  logFile(message, "INFO");
+  logFile(message, channel);
 
-  messageBuffer.push({
-    list:
-      Color.bgCyanBright.black(
-        " " + new Date().toLocaleTimeString(locale) + " "
-      ) +
-      " " +
-      Color.blackBright(message),
+  switch (channel) {
+    case logLevel.info:
+      messageBuffer.push({
+        list:
+          Color.bgCyan.black(
+            " " + new Date().toLocaleTimeString(locale) + " "
+          ) +
+          " " +
+          Color.blackBright(message),
 
-    throbber: Color.cyanBright(message),
-  });
+        throbber: Color.cyanBright(message),
+      });
+      break;
+
+    case logLevel.verbose:
+      if (options.verbose) {
+        messageBuffer.push({
+          list:
+            Color.bgBlackBright.black(
+              " " + new Date().toLocaleTimeString(locale) + " "
+            ) +
+            " " +
+            Color.blackBright(message),
+
+          throbber: Color.cyanBright(message),
+        });
+      }
+      break;
+
+    case logLevel.warn:
+      messageBuffer.push({
+        list:
+          Color.bgYellowBright.black(
+            " " + new Date().toLocaleTimeString(locale) + " "
+          ) +
+          " " +
+          Color.yellowBright(message),
+
+        throbber: Color.yellowBright(message),
+      });
+      break;
+
+    case logLevel.error:
+      messageBuffer.push({
+        list:
+          Color.bgRedBright.black(
+            " " + new Date().toLocaleTimeString(locale) + " "
+          ) +
+          " " +
+          Color.redBright(message),
+
+        throbber: Color.redBright(message),
+      });
+      break;
+  }
 };
 
 export const exit = (code: number = 0, message: string = "") => {
@@ -88,17 +176,19 @@ export const exit = (code: number = 0, message: string = "") => {
 
   {
     const uptime = process.uptime().toFixed(2);
-    console.log(Color.yellowBright(`✨ Took ${uptime} seconds to complete`));
+    console.log(
+      EOL + Color.yellowBright(`✨ Took ${uptime} seconds to complete`)
+    );
   }
 
   if (code) {
     message ||= "no message";
-    console.error(Color.bgRedBright.black.bold(` Error <${code}> ${message} `));
-    logFile(`Exiting with code ${code}: ${message}`, "ERROR");
+    console.error(Color.bgRed.black.bold(` Error <${code}> ${message} `));
+    logFile(`Exiting with code ${code}: ${message}`, logLevel.error);
   } else {
     message ||= "Success";
-    console.log(Color.bgGreenBright.black.bold(` ${message} `));
-    logFile(`Exiting with code ${code}: ${message}`, "INFO");
+    console.log(Color.bgGreen.black.bold(` ${message} `));
+    logFile(`Exiting with code ${code}: ${message}`, logLevel.info);
   }
 
   process.exit(code);
@@ -132,7 +222,7 @@ const throbberInterval = setInterval(() => {
   } else {
     process.stdout.write(throbberStr);
   }
-}, 200);
+}, 50);
 
 export const options = (() => {
   try {
@@ -154,8 +244,22 @@ export const options = (() => {
         defaultValue: false,
       },
       {
-        name: "version",
+        name: "verbose",
         alias: "v",
+        lazyMultiple: false,
+        multiple: false,
+        type: Boolean,
+        defaultValue: false,
+      },
+      {
+        name: "no-robots",
+        lazyMultiple: false,
+        multiple: false,
+        type: Boolean,
+        defaultValue: false,
+      },
+      {
+        name: "no-sitemap",
         lazyMultiple: false,
         multiple: false,
         type: Boolean,
@@ -177,18 +281,22 @@ export const options = (() => {
 
     return {};
   }
-})() as commandLineArgs.CommandLineOptions;
+})() as Readonly<{
+  path: string;
+  help: boolean;
+  verbose: boolean;
+  "no-robots": boolean;
+  "no-sitemap": boolean;
+}>;
 
-if (options.version) {
-  exit(0, `Photon CLI v${version}`);
-} else if (options.help) {
+if (options.help) {
   help();
   exit();
 } else if (!options.path) {
   help();
   exit(400, "No input directory specified, this option is required");
 } else {
-  options.path = resolve(options.path);
+  (options as any).path = resolve(options.path);
 
   if (existsSync(options.path)) {
     const stat = statSync(options.path);

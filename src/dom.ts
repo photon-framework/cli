@@ -1,7 +1,18 @@
-import { options } from "./cli";
+import { exit, options } from "./cli";
 import { JSDOM } from "jsdom";
+import { join } from "path";
+import { existsSync, readFileSync } from "fs";
 
-export const dom = new JSDOM(options.input);
+const indexHtmlPath = join(options.path, "index.html");
+
+if (!existsSync(indexHtmlPath)) {
+  exit(400, `No "index.html" found in "${options.path}"`);
+}
+
+export const dom = new JSDOM(readFileSync(indexHtmlPath, "utf8"));
+
+export const window = dom.window;
+export const document = dom.window.document;
 
 (globalThis as any).window = dom.window;
 (globalThis as any).document = dom.window.document;
