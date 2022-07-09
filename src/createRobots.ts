@@ -33,7 +33,7 @@ export const createRobots = (): string => {
     }
   }
 
-  if (!options["no-sitemap"] || existsSync(join(options.path, "sitemap.xml"))) {
+  if (!options["no-sitemap"] || existsSync(join(options.dist, "sitemap.xml"))) {
     robots.push("Sitemap: " + serverUrl("sitemap.xml"));
   } else {
     log("Skipping sitemap.xml in robots.txt", logLevel.info);

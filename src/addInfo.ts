@@ -22,5 +22,5 @@ export const serverUrl = (path: string) => {
 };
 
 export const routes = (() => {
-  systemJoin(options.path, router.dataset.content);
+  systemJoin(options.dist, router.dataset.content);
 })();

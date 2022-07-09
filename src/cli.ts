@@ -52,6 +52,7 @@ const help = () => {
 
 Options:
     ${highlight("--path")}          -p    Specify input directory
+    ${highlight("--source")}        -s    Specify source directory
     ${highlight("--help")}          -h    Show this help message
     ${highlight("--verbose")}       -v    Verbose output
     ${highlight("--no-robots")}           Disable generation of robots.txt
@@ -234,12 +235,19 @@ export const options = (() => {
   try {
     const options = commandLineArgs([
       {
-        name: "path",
-        alias: "p",
+        name: "dist",
+        alias: "d",
         lazyMultiple: false,
         multiple: false,
         type: String,
         defaultOption: true,
+      },
+      {
+        name: "source",
+        alias: "s",
+        lazyMultiple: false,
+        multiple: false,
+        type: String,
       },
       {
         name: "help",
@@ -295,7 +303,8 @@ export const options = (() => {
     return {};
   }
 })() as Readonly<{
-  path: string;
+  dist: string;
+  source: string;
   help: boolean;
   verbose: boolean;
   "no-robots": boolean;
@@ -306,20 +315,20 @@ export const options = (() => {
 if (options.help) {
   help();
   exit();
-} else if (!options.path) {
+} else if (!options.dist) {
   help();
   exit(400, "No input directory specified, this option is required");
 } else {
-  (options as any).path = resolve(options.path);
+  (options as any).path = resolve(options.dist);
 
-  if (existsSync(options.path)) {
-    const stat = statSync(options.path);
+  if (existsSync(options.dist)) {
+    const stat = statSync(options.dist);
     if (stat.isDirectory()) {
-      log(`Input directory "${options.path}"`);
+      log(`Input directory "${options.dist}"`);
     } else {
-      exit(401, `"${options.path}" is not a directory`);
+      exit(401, `"${options.dist}" is not a directory`);
     }
   } else {
-    exit(404, `Input directory "${options.path}" does not exist`);
+    exit(404, `Input directory "${options.dist}" does not exist`);
   }
 }

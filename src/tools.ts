@@ -6,7 +6,7 @@ import { options } from "./cli";
 export const systemToPosix = (path: string) => format(parse(path));
 
 export function* filesIn(path: string): Generator<string> {
-  path = join(options.path, path);
+  path = join(options.dist, path);
   const paths = readdirSync(path).map((x) => join(path, x));
 
   while (paths.length) {
@@ -19,7 +19,7 @@ export function* filesIn(path: string): Generator<string> {
 
       paths.push(...add);
     } else {
-      const pathToYield = systemToPosix(relative(options.path, absPath));
+      const pathToYield = systemToPosix(relative(options.dist, absPath));
       if (pathToYield[0] === "/") {
         yield pathToYield;
       } else {

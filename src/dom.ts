@@ -3,10 +3,10 @@ import { JSDOM } from "jsdom";
 import { join } from "path";
 import { existsSync, readFileSync } from "fs";
 
-const indexHtmlPath = join(options.path, "index.html");
+const indexHtmlPath = join(options.dist, "index.html");
 
 if (!existsSync(indexHtmlPath)) {
-  exit(400, `No "index.html" found in "${options.path}"`);
+  exit(400, `No "index.html" found in "${options.dist}"`);
 }
 
 export const dom = new JSDOM(readFileSync(indexHtmlPath, "utf8"));

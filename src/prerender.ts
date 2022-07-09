@@ -33,7 +33,7 @@ export const prerender = async (): Promise<void> => {
 
       const [error, data] = await tryToCatch(
         readFile,
-        join(options.path, file),
+        join(options.dist, file),
         "utf8"
       );
       if (error) {
@@ -60,7 +60,7 @@ export const prerender = async (): Promise<void> => {
           } else {
             const [error, ref] = await tryToCatch(
               readFile,
-              join(options.path, src),
+              join(options.dist, src),
               "utf8"
             );
 
@@ -79,7 +79,7 @@ export const prerender = async (): Promise<void> => {
         );
       }
 
-      const dir = join(options.path, route);
+      const dir = join(options.dist, route);
       if (!existsSync(dir)) {
         log(`Creating directory "${dir}"`, logLevel.verbose);
         const [error0] = await tryToCatch(mkdir, dir, {
