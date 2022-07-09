@@ -56,6 +56,7 @@ Options:
     ${highlight("--verbose")}       -v    Verbose output
     ${highlight("--no-robots")}           Disable generation of robots.txt
     ${highlight("--no-sitemap")}          Disable generation of sitemap.xml
+    ${highlight("--no-minify")}           Disable minification of files
 `)
   );
 };
@@ -270,6 +271,13 @@ export const options = (() => {
         type: Boolean,
         defaultValue: false,
       },
+      {
+        name: "no-minify",
+        lazyMultiple: false,
+        multiple: false,
+        type: Boolean,
+        defaultValue: false,
+      },
     ]);
 
     return options;
@@ -292,6 +300,7 @@ export const options = (() => {
   verbose: boolean;
   "no-robots": boolean;
   "no-sitemap": boolean;
+  "no-minify": boolean;
 }>;
 
 if (options.help) {

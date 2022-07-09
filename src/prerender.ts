@@ -8,6 +8,20 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import Mustache from "mustache";
 import { view } from "./view";
 import tryToCatch from "try-to-catch";
+import { minify } from "html-minifier";
+import type { Options as MinifyOptions } from "html-minifier";
+
+const minifyOptions: MinifyOptions = {
+  caseSensitive: true,
+  collapseBooleanAttributes: true,
+  collapseInlineTagWhitespace: true,
+  collapseWhitespace: true,
+  conservativeCollapse: true,
+  continueOnParseError: true,
+  minifyCSS: true,
+  minifyJS: true,
+  removeComments: true,
+};
 
 const refMap = new Map<string, string>();
 
@@ -76,10 +90,12 @@ export const prerender = async (): Promise<void> => {
         }
       }
 
+      const htmlOut = document.documentElement.outerHTML;
+
       const [error1] = await tryToCatch(
         writeFile,
         join(dir, "index.html"),
-        document.documentElement.outerHTML,
+        options["no-minify"] ? htmlOut : minify(htmlOut, minifyOptions),
         "utf8"
       );
       if (error1) {
