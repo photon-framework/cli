@@ -1070,6 +1070,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/try-to-catch@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@types/try-to-catch@npm:3.0.0"
+  checksum: b3c8cf6bf85d4f73789db0470ae3969fe7d88164594229555a2004b2ff8f3c3bfbc4bdb1fd8ad25846a82e1048cb904ed929d2a562f2aaec2818ddd1d40dc2d8
+  languageName: node
+  linkType: hard
+
 "abab@npm:^2.0.6":
   version: 2.0.6
   resolution: "abab@npm:2.0.6"
@@ -2835,11 +2842,13 @@ __metadata:
     "@types/jsdom": ^16.2.14
     "@types/mustache": ^4.1.3
     "@types/node": ^18.0.3
+    "@types/try-to-catch": ^3.0.0
     cli-color: ^2.0.3
     command-line-args: ^5.2.1
     jsdom: ^20.0.0
     mustache: ^4.2.0
     parcel: ^2.6.2
+    try-to-catch: ^3.0.1
     typescript: ^4.7.4
   bin:
     photon: ./index.js
@@ -3250,6 +3259,13 @@ __metadata:
   dependencies:
     punycode: ^2.1.1
   checksum: 44c3cc6767fb800490e6e9fd64fd49041aa4e49e1f6a012b34a75de739cc9ed3a6405296072c1df8b6389ae139c5e7c6496f659cfe13a04a4bff3a1422981270
+  languageName: node
+  linkType: hard
+
+"try-to-catch@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "try-to-catch@npm:3.0.1"
+  checksum: ab234d3c9a77632af1d5c2c184c9485ec3a4ed6fca97d4bb304f24b6c1bbe71598ef6d7db14334f4c8090c4f3a4c527faded872db6e402d1661a6898452bc9c7
   languageName: node
   linkType: hard
 
