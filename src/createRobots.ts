@@ -3,7 +3,7 @@ import { join } from "path";
 import { serverUrl } from "./addInfo";
 import { log, logLevel, options } from "./cli";
 import { router } from "./router";
-import { filesIn } from "./tools";
+import { filesIn, fileToRoute } from "./tools";
 
 export const createRobots = (): string => {
   const robots = [
@@ -21,7 +21,7 @@ export const createRobots = (): string => {
     log(`Disallowing "${file}" in robots.txt`, logLevel.verbose);
     robots.push("Disallow: " + file);
 
-    const routed = file.substring(8, file.lastIndexOf("."));
+    const routed = fileToRoute(file);
     if (
       routed === router.dataset.default ||
       routed !== router.dataset.fallback

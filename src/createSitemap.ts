@@ -1,7 +1,7 @@
 import { origin, serverUrl, started } from "./addInfo";
 import { log, logLevel } from "./cli";
 import { router } from "./router";
-import { filesIn } from "./tools";
+import { filesIn, fileToRoute } from "./tools";
 import { document } from "./dom";
 
 export const createSitemap = (): string => {
@@ -29,7 +29,7 @@ export const createSitemap = (): string => {
   }
 
   for (const file of filesIn("content")) {
-    const routed = file.substring(8, file.lastIndexOf("."));
+    const routed = fileToRoute(file);
 
     if (
       routed === router.dataset.default ||

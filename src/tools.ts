@@ -28,3 +28,15 @@ export function* filesIn(path: string): Generator<string> {
     }
   }
 }
+
+export const fileToRoute = (file: string) => {
+  const splittet = file.split("/").filter(Boolean);
+  const lastIndex = splittet.length - 1;
+  splittet[lastIndex] = splittet[lastIndex]!.substring(
+    0,
+    splittet[lastIndex]!.lastIndexOf(".")
+  );
+  splittet.shift();
+
+  return "/" + splittet.join("/");
+};
