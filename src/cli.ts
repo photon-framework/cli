@@ -5,7 +5,7 @@ import { resolve } from "path";
 import { EOL } from "os";
 
 const version = "1.0.0";
-
+const artifactPath = process.argv[1];
 console.log(
   Color.magentaBright(`
     ___       ___       ___       ___       ___       ___
@@ -17,13 +17,18 @@ console.log(
              \\/__/     \\/__/               \\/__/     \\/__/
 `)
 );
+console.log(Color.blackBright(`Node.js: ${process.version}`));
+if (artifactPath && existsSync(artifactPath)) {
+  console.log(Color.blackBright(`Artifact: ${artifactPath}`));
+}
+console.log(Color.blackBright(`Photon CLI v${version}`));
+console.log("");
 
 const highlight = Color.bold.underline.whiteBright;
 
 const help = () => {
   console.log(
-    Color.blackBright(`
-Usage:
+    Color.blackBright(`Usage:
     $ photon-cli [options ...]
 
 Options:
@@ -40,12 +45,15 @@ let throbberIndex = 0;
 
 const locale = Intl.DateTimeFormat().resolvedOptions().locale;
 const logFilePath = resolve("./photon.log");
-writeFileSync(
-  logFilePath,
-  new Date().toISOString() + "\tPhoton CLI log file" + EOL,
-  "utf8"
-);
-const logFile = (message: string, channel: "INFO" | "WARNING" | "ERROR") => {
+{
+  const [, , ...args] = process.argv;
+  writeFileSync(
+    logFilePath,
+    new Date().toISOString() + "\t[INFO]\tphoton-cli " + args.join(" ") + EOL,
+    "utf8"
+  );
+}
+const logFile = (message: string, channel: "INFO" | "WARN" | "ERROR") => {
   const ts = new Date().toISOString();
   appendFileSync(logFilePath, `${ts}\t[${channel}]\t${message}${EOL}`, "utf8");
 };
@@ -78,13 +86,20 @@ export const exit = (code: number = 0, message: string = "") => {
     console.log(messageBuffer.shift()!.list);
   }
 
-  if (code) {
-    console.error(Color.bgRedBright.black.bold(` Error <${code}> ${message} `));
-  } else if (message) {
-    console.log(Color.bgGreenBright.black.bold(` ${message} `));
+  {
+    const uptime = process.uptime().toFixed(2);
+    console.log(Color.yellowBright(`✨ Took ${uptime} seconds to complete`));
   }
 
-  logFile(`Exiting with code ${code}: ${message || "no message"}`, "ERROR");
+  if (code) {
+    message ||= "no message";
+    console.error(Color.bgRedBright.black.bold(` Error <${code}> ${message} `));
+    logFile(`Exiting with code ${code}: ${message}`, "ERROR");
+  } else {
+    message ||= "Success";
+    console.log(Color.bgGreenBright.black.bold(` ${message} `));
+    logFile(`Exiting with code ${code}: ${message}`, "INFO");
+  }
 
   process.exit(code);
 };
@@ -165,27 +180,24 @@ export const options = (() => {
 })() as commandLineArgs.CommandLineOptions;
 
 if (options.version) {
-  console.log(`Photon CLI v${version}`);
-  exit(0);
-}
-
-if (options.help) {
+  exit(0, `Photon CLI v${version}`);
+} else if (options.help) {
   help();
   exit();
-}
-
-if (!options.path) {
+} else if (!options.path) {
   help();
   exit(400, "No input directory specified, this option is required");
-}
-
-if (existsSync(options.path)) {
-  const stat = statSync(options.path);
-  if (stat.isDirectory()) {
-    log(`Input directory "${resolve(options.path)}"`);
-  } else {
-    exit(401, `"${options.path}" is not a directory`);
-  }
 } else {
-  exit(404, `Input directory "${options.path}" does not exist`);
+  options.path = resolve(options.path);
+
+  if (existsSync(options.path)) {
+    const stat = statSync(options.path);
+    if (stat.isDirectory()) {
+      log(`Input directory "${options.path}"`);
+    } else {
+      exit(401, `"${options.path}" is not a directory`);
+    }
+  } else {
+    exit(404, `Input directory "${options.path}" does not exist`);
+  }
 }
