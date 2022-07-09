@@ -1,7 +1,10 @@
 import commandLineArgs from "command-line-args";
 import Color from "cli-color";
-import { existsSync, statSync } from "fs";
+import { appendFileSync, existsSync, statSync, writeFileSync } from "fs";
 import { resolve } from "path";
+import { EOL } from "os";
+
+const version = "1.0.0";
 
 console.log(
   Color.magentaBright(`
@@ -24,55 +27,64 @@ Usage:
     $ photon-cli [options ...]
 
 Options:
-    ${highlight("--path")}   -p      Specify input directory
-    ${highlight("--help")}   -h      Show this help message
+    ${highlight("--path")}    -p    Specify input directory
+    ${highlight("--help")}    -h    Show this help message
+    ${highlight("--version")} -v    Show version
 `)
   );
 };
 
-let messageBuffer = "";
-let lasstMessageBuffer = "";
-let messageTime = new Array<string>();
+const messageBuffer = new Array<{ throbber: string; list: string }>();
 const throbber = ["–", "\\", "|", "/"];
 let throbberIndex = 0;
 
-export const log = (message: string) => {
-  crashGuard();
-
-  messageTime.push(
-    " " +
-      new Date().toLocaleTimeString(
-        Intl.DateTimeFormat().resolvedOptions().locale
-      ) +
-      " "
-  );
-
-  if (messageBuffer) {
-    lasstMessageBuffer = messageBuffer;
-  }
-
-  messageBuffer = message.substring(
-    0,
-    Math.min(message.length, Color.windowSize.width - 2)
-  );
+const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+const logFilePath = resolve("./photon.log");
+writeFileSync(
+  logFilePath,
+  new Date().toISOString() + "\tPhoton CLI log file" + EOL,
+  "utf8"
+);
+const logFile = (message: string, channel: "INFO" | "WARNING" | "ERROR") => {
+  const ts = new Date().toISOString();
+  appendFileSync(logFilePath, `${ts}\t[${channel}]\t${message}${EOL}`, "utf8");
 };
 
-export const exit = (code: number = 0, message: string = ""): never => {
+export const log = (message: string) => {
+  crashGuard();
+  logFile(message, "INFO");
+
+  messageBuffer.push({
+    list:
+      Color.bgCyanBright.black(
+        " " + new Date().toLocaleTimeString(locale) + " "
+      ) +
+      " " +
+      Color.blackBright(message),
+
+    throbber: Color.cyanBright(message),
+  });
+};
+
+export const exit = (code: number = 0, message: string = "") => {
   clearInterval(throbberInterval);
+  if (crashGuardId) {
+    clearInterval(crashGuardId);
+  }
+
   process.stdout.write("\x1b[2K\x1b[0G");
 
-  if (messageBuffer) {
-    process.stdout.write(Color.bgCyanBright.black(messageTime.shift()));
-    process.stdout.write(" " + Color.cyanBright(messageBuffer) + "\r\n");
+  while (messageBuffer.length) {
+    console.log(messageBuffer.shift()!.list);
   }
 
   if (code) {
-    process.stderr.write(
-      Color.bgRedBright.black.bold(` Error <${code}> ${message} \r\n`)
-    );
+    console.error(Color.bgRedBright.black.bold(` Error <${code}> ${message} `));
   } else if (message) {
-    process.stdout.write(Color.bgGreenBright.black.bold(` ${message} \r\n`));
+    console.log(Color.bgGreenBright.black.bold(` ${message} `));
   }
+
+  logFile(`Exiting with code ${code}: ${message || "no message"}`, "ERROR");
 
   process.exit(code);
 };
@@ -86,7 +98,7 @@ const crashGuard = () => {
 
   crashGuardId = setTimeout(() => {
     exit(500, "Crash guard triggered (no response)");
-  }, 30000);
+  }, 5000);
 };
 
 const throbberInterval = setInterval(() => {
@@ -94,17 +106,16 @@ const throbberInterval = setInterval(() => {
 
   process.stdout.write("\x1b[2K\x1b[0G");
 
-  if (lasstMessageBuffer) {
-    process.stdout.write(Color.bgCyanBright.black(messageTime.shift()));
-    process.stdout.write(" " + Color.cyanBright(lasstMessageBuffer) + "\r\n");
-
-    lasstMessageBuffer = "";
+  while (messageBuffer.length > 1) {
+    console.log(messageBuffer.shift()!.list);
   }
 
-  process.stdout.write(Color.cyanBright(throbber[throbberIndex]!));
+  const throbberStr = Color.magenta(throbber[throbberIndex]!);
 
-  if (messageBuffer) {
-    process.stdout.write(" " + Color.blackBright(messageBuffer));
+  if (messageBuffer.length !== 0) {
+    process.stdout.write(throbberStr + " " + messageBuffer[0]!.throbber);
+  } else {
+    process.stdout.write(throbberStr);
   }
 }, 200);
 
@@ -127,6 +138,14 @@ export const options = (() => {
         type: Boolean,
         defaultValue: false,
       },
+      {
+        name: "version",
+        alias: "v",
+        lazyMultiple: false,
+        multiple: false,
+        type: Boolean,
+        defaultValue: false,
+      },
     ]);
 
     return options;
@@ -144,6 +163,11 @@ export const options = (() => {
     return {};
   }
 })() as commandLineArgs.CommandLineOptions;
+
+if (options.version) {
+  console.log(`Photon CLI v${version}`);
+  exit(0);
+}
 
 if (options.help) {
   help();
