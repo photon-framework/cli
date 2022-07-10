@@ -9,14 +9,12 @@ export function* filesIn(path: string): Generator<string> {
   path = join(options.dist, path);
   const paths = readdirSync(path).map((x) => join(path, x));
 
-  while (paths.length) {
+  while (paths.length !== 0) {
     const absPath = paths.shift()!;
-
     const stat = statSync(absPath);
 
     if (stat.isDirectory()) {
       const add = readdirSync(absPath).map((x) => join(absPath, x));
-
       paths.push(...add);
     } else {
       const pathToYield = systemToPosix(relative(options.dist, absPath));

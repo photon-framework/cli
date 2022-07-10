@@ -60,6 +60,9 @@ Options:
     ${highlight("--help")}          -h    Show this help message
     ${highlight("--verbose")}       -v    Verbose output
     ${highlight("--no-robots")}           Disable generation of robots.txt
+    ${highlight(
+      "--no-pbs"
+    )}                Disable pre build steps (like Markdown)
     ${highlight("--no-sitemap")}          Disable generation of sitemap.xml
     ${highlight("--no-minify")}           Disable minification of files
 `)
@@ -305,6 +308,13 @@ export const options = (() => {
           type: Boolean,
           defaultValue: false,
         },
+        {
+          name: "no-pbs",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
       ],
       {
         stopAtFirstUnknown: true,
@@ -337,6 +347,7 @@ export const options = (() => {
   noRobots: boolean;
   noSitemap: boolean;
   noMinify: boolean;
+  noPbs: boolean;
 }>;
 
 if (options.help) {
