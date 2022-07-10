@@ -23,27 +23,6 @@ console.log(
 `)
 );
 
-const artifactPath = process.argv[1];
-
-if (artifactPath && existsSync(artifactPath)) {
-  console.log(Color.blackBright(`Artifact: ${artifactPath}`));
-
-  const dname = dirname(artifactPath);
-
-  const packageJsonPath = dname.endsWith(".bin")
-    ? resolve(dname, "../photon-cli/package.json")
-    : resolve(dname, "package.json");
-
-  if (existsSync(packageJsonPath)) {
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
-    if ("version" in packageJson) {
-      console.log(Color.blackBright(`Photon CLI v${packageJson.version}`));
-    }
-  }
-}
-console.log(Color.blackBright(`Node.js: ${process.version}`));
-console.log("");
-
 const highlight = Color.bold.underline.whiteBright;
 
 const help = () => {
@@ -69,27 +48,13 @@ Options:
   );
 };
 
-const messageBuffer = new Array<{ throbber: string; list: string }>();
-const throbber = (() => {
-  const a = ["|", "/", "-", "\\"];
-  const b = new Array<string>();
-  for (let i = 0; i < a.length; i++) {
-    b.push(a[i]!);
-    b.push(a[i]!);
-    b.push(a[i]!);
-    b.push(a[i]!);
-  }
-  return b;
-})();
-let throbberIndex = 0;
-
 const locale = Intl.DateTimeFormat().resolvedOptions().locale;
 const logFilePath = resolve("./photon.log");
 {
   const [, , ...args] = process.argv;
   writeFileSync(
     logFilePath,
-    new Date().toISOString() + "\t[INFO]  \tphoton-cli " + args.join(" ") + EOL,
+    new Date().toISOString() + "\t[INFO]  \t$ photon " + args.join(" ") + EOL,
     "utf8"
   );
 }
@@ -115,86 +80,78 @@ export enum logLevel {
   error = "ERROR",
 }
 
+const clear = "\x1b[2K\x1b[0G";
+
 export const log = (message: string, channel: logLevel = logLevel.info) => {
   crashGuard();
   logFile(message, channel);
 
   switch (channel) {
     case logLevel.info:
-      messageBuffer.push({
-        list:
+      console.log(
+        clear +
           Color.bgCyan.black(
             " " + new Date().toLocaleTimeString(locale) + " "
           ) +
           " " +
-          Color.blackBright(message),
-
-        throbber: Color.cyanBright(message),
-      });
+          Color.blackBright(message)
+      );
       break;
 
     case logLevel.verbose:
       if (options.verbose) {
-        messageBuffer.push({
-          list:
+        console.debug(
+          clear +
             Color.bgBlackBright.black(
               " " + new Date().toLocaleTimeString(locale) + " "
             ) +
             " " +
-            Color.blackBright(message),
-
-          throbber: Color.cyanBright(message),
-        });
+            Color.blackBright(message)
+        );
       }
       break;
 
     case logLevel.warn:
-      messageBuffer.push({
-        list:
+      console.warn(
+        clear +
           Color.bgYellowBright.black(
             " " + new Date().toLocaleTimeString(locale) + " "
           ) +
           " " +
-          Color.yellowBright(message),
-
-        throbber: Color.yellowBright(message),
-      });
+          Color.yellowBright(message)
+      );
       break;
 
     case logLevel.error:
-      messageBuffer.push({
-        list:
+      console.error(
+        clear +
           Color.bgRedBright.black(
             " " + new Date().toLocaleTimeString(locale) + " "
           ) +
           " " +
-          Color.redBright(message),
-
-        throbber: Color.redBright(message),
-      });
+          Color.redBright(message)
+      );
       break;
   }
 };
 
+const throbber = Color.throbber(
+  (str) => {
+    process.stdout.write(str);
+  },
+  250,
+  (str) => Color.magenta(str)
+);
+throbber.start();
+
 export const exit = (code: number = 0, message: string = "") => {
-  clearInterval(throbberInterval);
+  throbber.stop();
   if (crashGuardId) {
     clearInterval(crashGuardId);
   }
   closeAllWindows();
 
-  process.stdout.write("\x1b[2K\x1b[0G");
-
-  while (messageBuffer.length) {
-    console.log(messageBuffer.shift()!.list);
-  }
-
-  {
-    const uptime = process.uptime().toFixed(2);
-    console.log(
-      EOL + Color.yellowBright(`✨ Took ${uptime} seconds to complete`)
-    );
-  }
+  console.log(clear);
 
   if (code) {
     message ||= "no message";
@@ -233,24 +190,6 @@ export const stopCrashGuard = () => {
     clearInterval(crashGuardId);
   }
 };
-
-const throbberInterval = setInterval(() => {
-  throbberIndex = (throbberIndex + 1) % throbber.length;
-
-  process.stdout.write("\x1b[2K\x1b[0G");
-
-  while (messageBuffer.length > 1) {
-    console.log(messageBuffer.shift()!.list);
-  }
-
-  const throbberStr = Color.magenta(throbber[throbberIndex]!);
-
-  if (messageBuffer.length !== 0) {
-    process.stdout.write(throbberStr + " " + messageBuffer[0]!.throbber);
-  } else {
-    process.stdout.write(throbberStr);
-  }
-}, 50);
 
 export const options = (() => {
   try {
@@ -349,6 +288,35 @@ export const options = (() => {
   noMinify: boolean;
   noPbs: boolean;
 }>;
+
+const artifactPath = process.argv[1];
+
+if (artifactPath && existsSync(artifactPath)) {
+  console.log(Color.blackBright(`Artifact: ${artifactPath}`));
+
+  const dname = dirname(artifactPath);
+
+  const packageJsonPath = dname.endsWith(".bin")
+    ? resolve(dname, "../photon-cli/package.json")
+    : resolve(dname, "package.json");
+
+  if (existsSync(packageJsonPath)) {
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+    if ("version" in packageJson) {
+      console.log(Color.blackBright(`Photon CLI v${packageJson.version}`));
+    }
+  }
+}
+
+if (options.verbose) {
+  for (const k in process.versions) {
+    if (process.versions.hasOwnProperty(k)) {
+      const display = k[0]!.toUpperCase() + k.substring(1);
+      console.log(Color.blackBright(`${display}: ${process.versions[k]}`));
+    }
+  }
+}
+console.log("");
 
 if (options.help) {
   help();
