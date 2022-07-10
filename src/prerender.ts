@@ -95,7 +95,7 @@ export const prerender = async (): Promise<void> => {
       const [error1] = await tryToCatch(
         writeFile,
         join(dir, "index.html"),
-        options["no-minify"] ? htmlOut : minify(htmlOut, minifyOptions),
+        options.noMinify ? htmlOut : minify(htmlOut, minifyOptions),
         "utf8"
       );
       if (error1) {

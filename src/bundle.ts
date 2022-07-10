@@ -1,5 +1,4 @@
 import { exit, log, logLevel, options, stopCrashGuard } from "./cli";
-import { existsSync } from "fs";
 import { relative } from "path";
 import { join as joinPosix } from "path/posix";
 import { Parcel } from "@parcel/core";
@@ -13,20 +12,14 @@ const baseParcelOptions: InitialParcelOptions = {
   shouldAutoInstall: true,
   shouldContentHash: true,
   defaultConfig: "@parcel/config-default",
-  defaultTargetOptions: {
-    engines: {
-      browsers: [
-        "last 5 Android versions",
-        "last 5 Chrome versions",
-        "last 5 ChromeAndroid versions",
-        "last 5 Firefox versions",
-        "last 5 FirefoxAndroid versions",
-        "last 1 Explorer version",
-        "last 5 Opera versions",
-        "last 5 Safari versions",
-        "last 5 iOS versions",
-        "last 5 Samsung versions",
-      ],
+  targets: {
+    default: {
+      distDir: "dist",
+      sourceMap: true,
+      context: "browser",
+      engines: {
+        browsers: ["> 0.5%", "last 3 versions", "Firefox ESR", "not dead"],
+      },
     },
   },
 };
@@ -81,24 +74,22 @@ const handleBuildFailureEvent = (
 };
 
 export const bundle = async () => {
-  if (options.source && existsSync(options.source)) {
-    log(`Bundling "${options.source}"`);
+  log(`Bundling "${options.source}"`);
 
-    const bundler = new Parcel({
-      ...baseParcelOptions,
-      mode: "production",
-      env: {
-        NODE_ENV: "production",
-      },
-    });
+  const bundler = new Parcel({
+    ...baseParcelOptions,
+    mode: "production",
+    env: {
+      NODE_ENV: "production",
+    },
+  });
 
-    try {
-      const { bundleGraph, buildTime } = await bundler.run();
-      const bundles = bundleGraph.getBundles();
-      log(`Built ${bundles.length} bundles in ${buildTime}ms`);
-    } catch (err) {
-      handleBuildFailureEvent(err as BuildFailureEvent, true);
-    }
+  try {
+    const { bundleGraph, buildTime } = await bundler.run();
+    const bundles = bundleGraph.getBundles();
+    log(`Built ${bundles.length} bundles in ${buildTime}ms`);
+  } catch (err) {
+    handleBuildFailureEvent(err as BuildFailureEvent, true);
   }
 };
 

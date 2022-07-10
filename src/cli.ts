@@ -251,67 +251,68 @@ const throbberInterval = setInterval(() => {
 
 export const options = (() => {
   try {
-    const options = commandLineArgs([
+    const options = commandLineArgs(
+      [
+        {
+          name: "source",
+          alias: "s",
+          lazyMultiple: false,
+          multiple: false,
+          type: String,
+          defaultOption: true,
+        },
+        {
+          name: "serve",
+          lazyMultiple: false,
+          multiple: false,
+          type: Number,
+          defaultValue: false,
+        },
+        {
+          name: "help",
+          alias: "h",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
+        {
+          name: "verbose",
+          alias: "v",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
+        {
+          name: "no-robots",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
+        {
+          name: "no-sitemap",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
+        {
+          name: "no-minify",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
+      ],
       {
-        name: "dist",
-        alias: "d",
-        lazyMultiple: false,
-        multiple: false,
-        type: String,
-        defaultOption: true,
-      },
-      {
-        name: "source",
-        alias: "s",
-        lazyMultiple: false,
-        multiple: false,
-        type: String,
-      },
-      {
-        name: "serve",
-        lazyMultiple: false,
-        multiple: false,
-        type: Number,
-        defaultValue: false,
-      },
-      {
-        name: "help",
-        alias: "h",
-        lazyMultiple: false,
-        multiple: false,
-        type: Boolean,
-        defaultValue: false,
-      },
-      {
-        name: "verbose",
-        alias: "v",
-        lazyMultiple: false,
-        multiple: false,
-        type: Boolean,
-        defaultValue: false,
-      },
-      {
-        name: "no-robots",
-        lazyMultiple: false,
-        multiple: false,
-        type: Boolean,
-        defaultValue: false,
-      },
-      {
-        name: "no-sitemap",
-        lazyMultiple: false,
-        multiple: false,
-        type: Boolean,
-        defaultValue: false,
-      },
-      {
-        name: "no-minify",
-        lazyMultiple: false,
-        multiple: false,
-        type: Boolean,
-        defaultValue: false,
-      },
-    ]);
+        stopAtFirstUnknown: true,
+        camelCase: true,
+        caseInsensitive: true,
+        partial: false,
+      }
+    );
 
     return options;
   } catch (e) {
@@ -333,30 +334,28 @@ export const options = (() => {
   serve: number;
   help: boolean;
   verbose: boolean;
-  "no-robots": boolean;
-  "no-sitemap": boolean;
-  "no-minify": boolean;
+  noRobots: boolean;
+  noSitemap: boolean;
+  noMinify: boolean;
 }>;
 
 if (options.help) {
   help();
   exit();
-} else if (!isNaN(options.serve) && options.serve > 0 && !options.source) {
-  exit(400, "Source directory is required when serving");
-} else if (!options.dist) {
-  help();
-  exit(400, "No input directory specified, this option is required");
+} else if (
+  typeof options.serve === "number" &&
+  !isNaN(options.serve) &&
+  options.serve < 1
+) {
+  exit(401, `Port ${options.serve} is not valid`);
 } else {
-  (options as any).path = resolve(options.dist);
+  const stat = statSync(options.source);
+  if (stat.isDirectory()) {
+    log(`Input directory "${options.source}"`);
 
-  if (existsSync(options.dist)) {
-    const stat = statSync(options.dist);
-    if (stat.isDirectory()) {
-      log(`Input directory "${options.dist}"`);
-    } else {
-      exit(401, `"${options.dist}" is not a directory`);
-    }
+    (options as any).dist = resolve("./dist");
+    log(`Output directory "${options.dist}"`);
   } else {
-    exit(404, `Input directory "${options.dist}" does not exist`);
+    exit(401, `"${options.source}" is not a directory`);
   }
 }

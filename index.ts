@@ -17,7 +17,7 @@ if (!isNaN(options.serve) && options.serve) {
         const { prerender } = require("./src/prerender");
 
         // robots.txt
-        if (options["no-robots"]) {
+        if (options.noRobots) {
           log("Skipping robots.txt generation", logLevel.info);
         } else {
           const robotsTxtLocation = join(options.dist, "robots.txt");
@@ -31,7 +31,7 @@ if (!isNaN(options.serve) && options.serve) {
         }
 
         // sitemap.xml
-        if (options["no-sitemap"]) {
+        if (options.noSitemap) {
           log("Skipping sitemap.xml generation", logLevel.info);
         } else {
           const sitemapXmlLocation = join(options.dist, "sitemap.xml");
