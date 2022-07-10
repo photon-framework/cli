@@ -53,10 +53,27 @@ export const prerender = async (): Promise<void> => {
         document.documentElement.lang = lang || "";
       }
 
-      if (route === router.dataset.default) {
-        canonicalLinkEl.href = serverUrl("/");
-      } else {
-        canonicalLinkEl.href = serverUrl(route);
+      const canonicalHref =
+        route === router.dataset.default ? serverUrl("/") : serverUrl(route);
+
+      canonicalLinkEl.href = canonicalHref;
+
+      {
+        const ogUrlEl = document.querySelector(
+          "meta[property='og:url']"
+        ) as HTMLMetaElement | null;
+        if (ogUrlEl) {
+          ogUrlEl.content = canonicalHref;
+        }
+      }
+
+      {
+        const twitterEl = document.querySelector(
+          "meta[property='twitter:url']"
+        ) as HTMLMetaElement | null;
+        if (twitterEl) {
+          twitterEl.content = canonicalHref;
+        }
       }
 
       for (const script of Array.from(router.getElementsByTagName("script"))) {
