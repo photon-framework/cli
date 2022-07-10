@@ -353,7 +353,7 @@ if (options.help) {
   if (stat.isDirectory()) {
     log(`Input directory "${options.source}"`);
 
-    (options as any).dist = resolve("./dist");
+    (options as any).dist = resolve(options.source, "../dist/");
     log(`Output directory "${options.dist}"`);
   } else {
     exit(401, `"${options.source}" is not a directory`);

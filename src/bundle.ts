@@ -1,5 +1,5 @@
 import { exit, log, logLevel, options, stopCrashGuard } from "./cli";
-import { relative } from "path";
+import { relative, resolve } from "path";
 import { join as joinPosix } from "path/posix";
 import { Parcel } from "@parcel/core";
 import type { InitialParcelOptions } from "@parcel/types";
@@ -8,13 +8,13 @@ import { openUri } from "./windows";
 
 const baseParcelOptions: InitialParcelOptions = {
   entries: joinPosix(relative(process.cwd(), options.source), "**/*.html"),
-  cacheDir: joinPosix(relative(process.cwd(), options.source), ".photon-cache"),
+  cacheDir: "./.photon-cache",
   shouldAutoInstall: true,
   shouldContentHash: true,
   defaultConfig: "@parcel/config-default",
   targets: {
     default: {
-      distDir: "dist",
+      distDir: options.dist,
       sourceMap: true,
       context: "browser",
       engines: {
@@ -85,9 +85,11 @@ export const bundle = async () => {
   });
 
   try {
-    const { bundleGraph, buildTime } = await bundler.run();
+    const { bundleGraph } = await bundler.run();
     const bundles = bundleGraph.getBundles();
-    log(`Built ${bundles.length} bundles in ${buildTime}ms`);
+    for (const b of bundles) {
+      log(`Bundle ${b.name} <${b.type.toUpperCase()}>`, logLevel.verbose);
+    }
   } catch (err) {
     handleBuildFailureEvent(err as BuildFailureEvent, true);
   }
