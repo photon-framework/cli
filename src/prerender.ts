@@ -10,6 +10,7 @@ import { view } from "./view";
 import tryToCatch from "try-to-catch";
 import { minify } from "html-minifier";
 import type { Options as MinifyOptions } from "html-minifier";
+import { canonicalLinkEl, serverUrl } from "./addInfo";
 
 const minifyOptions: MinifyOptions = {
   caseSensitive: true,
@@ -28,6 +29,7 @@ const refMap = new Map<string, string>();
 export const prerender = async (): Promise<void> => {
   for (const file of filesIn("content")) {
     const route = fileToRoute(file);
+
     if (route === router.dataset.default || route !== router.dataset.fallback) {
       log(`Prerendering "${route}"`, logLevel.verbose);
 
@@ -36,10 +38,25 @@ export const prerender = async (): Promise<void> => {
         join(options.dist, file),
         "utf8"
       );
+
       if (error) {
         exit(500, error.message);
       } else if (typeof data === "string") {
         router.innerHTML = data;
+      } else {
+        router.innerHTML = data.toString();
+      }
+
+      if (router.dataset.langSegment) {
+        const langIndex = Number.parseInt(router.dataset.langSegment, 10);
+        const lang = route.split("/").filter(Boolean)[langIndex];
+        document.documentElement.lang = lang || "";
+      }
+
+      if (route === router.dataset.default) {
+        canonicalLinkEl.href = serverUrl("/");
+      } else {
+        canonicalLinkEl.href = serverUrl(route);
       }
 
       for (const script of Array.from(router.getElementsByTagName("script"))) {

@@ -5,7 +5,9 @@ import { options } from "./cli";
 
 export const systemToPosix = (path: string) => format(parse(path));
 
-export function* filesIn(path: string): Generator<string> {
+export function filesIn(path: string): Iterable<string> {
+  const y = new Array<string>();
+
   path = join(options.dist, path);
   const paths = readdirSync(path).map((x) => join(path, x));
 
@@ -18,13 +20,16 @@ export function* filesIn(path: string): Generator<string> {
       paths.push(...add);
     } else {
       const pathToYield = systemToPosix(relative(options.dist, absPath));
+
       if (pathToYield[0] === "/") {
-        yield pathToYield;
+        y.push(pathToYield);
       } else {
-        yield "/" + pathToYield;
+        y.push("/" + pathToYield);
       }
     }
   }
+
+  return y;
 }
 
 export const fileToRoute = (file: string) => {

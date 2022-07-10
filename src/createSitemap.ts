@@ -5,7 +5,7 @@ import { filesIn, fileToRoute } from "./tools";
 import { document } from "./dom";
 
 export const createSitemap = (): string => {
-  const lastmod = started.toISOString();
+  const lastmod = started.toISOString().split("T")[0]!;
   const urls = document.createElement("urlset");
   urls.setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
