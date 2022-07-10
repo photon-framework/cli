@@ -2,7 +2,7 @@
   "name": "photon-cli",
   "displayName": "Photon CLI",
   "type": "commonjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "compiler for the photon web-framework",
   "main": "index.js",
   "bin": {
