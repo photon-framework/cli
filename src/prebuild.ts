@@ -35,6 +35,10 @@ const md = new showdown.Converter({
 });
 
 export const prebuild = async () => {
+  if (options.noPbs) {
+    return;
+  }
+
   log("Prebuilding");
 
   const gitignore = [
