@@ -58,7 +58,7 @@ export const prebuild = async () => {
       const filePath = join(dir, f);
       const stat = await fs.stat(filePath);
       if (stat.isDirectory()) {
-        dirList.push(filePath);
+        dirList.unshift(filePath);
       } else {
         const ext = extname(filePath);
         if (ext === ".md") {
@@ -78,5 +78,8 @@ export const prebuild = async () => {
     }
   }
 
-  await fs.writeFile(join(options.source, ".gitignore"), gitignore.join("\n"));
+  await fs.writeFile(
+    join(options.source, ".gitignore"),
+    gitignore.join("\n") + "\n"
+  );
 };

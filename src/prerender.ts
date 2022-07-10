@@ -1,6 +1,6 @@
 import { log, logLevel, options, exit } from "./cli";
 import { filesIn, fileToRoute } from "./tools";
-import { document } from "./dom";
+import { document, dom } from "./dom";
 import { router } from "./router";
 import { join } from "path";
 import { existsSync } from "fs";
@@ -27,6 +27,15 @@ const minifyOptions: MinifyOptions = {
 const refMap = new Map<string, string>();
 
 export const prerender = async (): Promise<void> => {
+  {
+    const indexHtml = options.noMinify
+      ? dom.serialize()
+      : minify(dom.serialize(), minifyOptions);
+    const indexHtmlPath = join(options.dist, "index.html");
+    log('Prerendering "/"', logLevel.verbose);
+    await writeFile(indexHtmlPath, indexHtml);
+  }
+
   for (const file of filesIn("content")) {
     const route = fileToRoute(file);
 
@@ -124,7 +133,7 @@ export const prerender = async (): Promise<void> => {
         }
       }
 
-      const htmlOut = document.documentElement.outerHTML;
+      const htmlOut = dom.serialize();
 
       const [error1] = await tryToCatch(
         writeFile,

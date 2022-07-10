@@ -144,7 +144,7 @@ const throbber = Color.throbber(
 );
 throbber.start();
 
-export const exit = (code: number = 0, message: string = "") => {
+export const exit = (code: number = 0, message: string | Error = "") => {
   throbber.stop();
   if (crashGuardId) {
     clearInterval(crashGuardId);
@@ -152,6 +152,14 @@ export const exit = (code: number = 0, message: string = "") => {
   closeAllWindows();
 
   console.log(clear);
+
+  if (typeof message === "object") {
+    if ("message" in message) {
+      message = message.message;
+    } else {
+      message = (message as any).toString();
+    }
+  }
 
   if (code) {
     message ||= "no message";
