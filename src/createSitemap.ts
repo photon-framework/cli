@@ -1,38 +1,61 @@
-import { ensureWebPath } from "./ensureWebPath";
+import { origin, serverUrl, started } from "./addInfo";
+import { log, logLevel } from "./cli";
+import { router } from "./router";
+import { filesIn, fileToRoute } from "./tools";
+import { document } from "./dom";
 
-const createSitemapUrl = (
-  xml: Array<string>,
-  loc: string,
-  lastmod: string,
-  priority: number
-) => {
-  xml.push("<url>");
-  xml.push(`<loc>${loc}</loc>`);
-  xml.push(`<lastmod>${lastmod}</lastmod>`);
-  xml.push(`<priority>${priority.toFixed(2)}</priority>`);
-  xml.push("</url>");
-};
+export const createSitemap = (): string => {
+  const lastmod = started.toISOString().split("T")[0]!;
+  const urls = document.createElement("urlset");
+  urls.setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-export const createSitemap = (paths: Iterable<string>, canonical: string) => {
-  console.log("Creating Sitemap");
+  if (router.dataset.homeAsEmpty) {
+    log(`Adding "/" to sitemap.xml`, logLevel.verbose);
+    const url = document.createElement("url");
 
-  while (canonical.endsWith("/")) {
-    canonical = canonical.slice(0, -1);
+    const locEl = document.createElement("loc");
+    locEl.textContent = origin;
+    url.appendChild(locEl);
+
+    const lastmodEl = document.createElement("lastmod");
+    lastmodEl.textContent = lastmod;
+    url.appendChild(lastmodEl);
+
+    const priorityEl = document.createElement("priority");
+    priorityEl.textContent = "0.5";
+    url.appendChild(priorityEl);
+
+    urls.appendChild(url);
   }
 
-  const date = new Date().toISOString().split("T")[0]!;
+  for (const file of filesIn("content")) {
+    const routed = fileToRoute(file);
 
-  const xml = [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ];
+    if (
+      routed === router.dataset.default ||
+      routed !== router.dataset.fallback
+    ) {
+      log(`Adding "${routed}" to sitemap.xml`, logLevel.verbose);
 
-  createSitemapUrl(xml, `${canonical}/`, date, 1);
-  for (const path of paths) {
-    createSitemapUrl(xml, `${canonical}/${ensureWebPath(path)}`, date, 0.75);
+      const url = document.createElement("url");
+
+      const locEl = document.createElement("loc");
+      locEl.textContent = serverUrl(routed);
+      url.appendChild(locEl);
+
+      const lastmodEl = document.createElement("lastmod");
+      lastmodEl.textContent = lastmod;
+      url.appendChild(lastmodEl);
+
+      const priorityEl = document.createElement("priority");
+      priorityEl.textContent = "0.5";
+      url.appendChild(priorityEl);
+
+      urls.appendChild(url);
+    } else {
+      log(`Skipping "${routed}" for sitemap.xml`, logLevel.verbose);
+    }
   }
 
-  xml.push("</urlset>");
-
-  return xml.join("");
+  return '<?xml version="1.0" encoding="UTF-8"?>' + urls.outerHTML + "\n";
 };

@@ -1,31 +1,43 @@
-import { EOL } from "os";
-import { ensureWebPath } from "./ensureWebPath";
+import { existsSync } from "fs";
+import { join } from "path";
+import { serverUrl } from "./addInfo";
+import { log, logLevel, options } from "./cli";
+import { router } from "./router";
+import { filesIn, fileToRoute } from "./tools";
 
-export const createRobots = (
-  pathsAllow: Iterable<string>,
-  pathsDisallow: Iterable<string>,
-  sitemap?: string
-) => {
-  console.log("Creating robots.txt");
-
+export const createRobots = (): string => {
   const robots = [
     "User-agent: *",
-    "Disallow: /content/*",
     "Disallow: *.css",
+    "Disallow: *.svg",
     "Disallow: *.js",
   ];
 
-  for (const path of pathsDisallow) {
-    robots.push(`Disallow: /${ensureWebPath(path)}`);
+  if (router.dataset.homeAsEmpty) {
+    robots.push("Allow: /");
   }
 
-  for (const path of pathsAllow) {
-    robots.push(`Allow: /${ensureWebPath(path)}`);
+  for (const file of filesIn("content")) {
+    log(`Disallowing "${file}" in robots.txt`, logLevel.verbose);
+    robots.push("Disallow: " + file);
+
+    const routed = fileToRoute(file);
+    if (
+      routed === router.dataset.default ||
+      routed !== router.dataset.fallback
+    ) {
+      log(`Allowing "${routed}" in robots.txt`, logLevel.verbose);
+      robots.push("Allow: " + routed);
+    } else {
+      log(`Skipping "${routed}" for robots.txt`, logLevel.verbose);
+    }
   }
 
-  if (sitemap) {
-    robots.push("Sitemap: " + ensureWebPath(sitemap));
+  if (!options.noSitemap || existsSync(join(options.dist, "sitemap.xml"))) {
+    robots.push("Sitemap: " + serverUrl("sitemap.xml"));
+  } else {
+    log("Skipping sitemap.xml in robots.txt", logLevel.info);
   }
 
-  return robots.join(EOL) + EOL;
+  return robots.join("\n") + "\n";
 };

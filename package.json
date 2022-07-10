@@ -1,7 +1,10 @@
 {
   "name": "photon-cli",
   "displayName": "Photon CLI",
-  "type": "module",
+  "type": "commonjs",
+  "version": "1.0.0",
+  "description": "compiler for the photon web-framework",
+  "main": "index.js",
   "bin": {
     "photon": "./index.js"
   },
@@ -11,9 +14,6 @@
     "test": "node ./index.js \"../homepage/dist/\"",
     "deploy": "yarn npm publish --access public"
   },
-  "version": "0.4.3",
-  "description": "compiler for the photon web-framework",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/photon-framework/cli.git"
@@ -25,14 +25,30 @@
   "author": "Frank Mayer <frank.mayer1907@protonmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@frank-mayer/dom-serializer": "^2.0.2",
-    "domhandler": "^4.3.0",
-    "domutils": "^2.8.0",
-    "htmlparser2": "^7.2.0"
+    "@parcel/config-default": "^2.6.2",
+    "@parcel/core": "^2.6.2",
+    "@parcel/transformer-sass": "^2.6.2",
+    "cli-color": "^2.0.3",
+    "command-line-args": "^5.2.1",
+    "html-minifier": "^4.0.0",
+    "image-size": "^1.0.1",
+    "jsdom": "^20.0.0",
+    "mustache": "^4.2.0",
+    "open": "^8.4.0",
+    "parcel": "^2.6.2",
+    "showdown": "^2.1.0",
+    "try-to-catch": "^3.0.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.22",
-    "parcel": "^2.3.2",
-    "typescript": "^4.6.2"
+    "@parcel/types": "^2.6.2",
+    "@types/cli-color": "^2.0.2",
+    "@types/command-line-args": "^5.2.0",
+    "@types/html-minifier": "^4.0.2",
+    "@types/jsdom": "^16.2.14",
+    "@types/mustache": "^4.1.3",
+    "@types/node": "^18.0.3",
+    "@types/showdown": "^2.0.0",
+    "@types/try-to-catch": "^3.0.0",
+    "typescript": "^4.7.4"
   }
 }

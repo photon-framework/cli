@@ -1,9 +1,13 @@
 .parcel-cache
-node_modules
+.photon-cache
 .yarn
+node_modules
+src
 .yarnrc.yml
+.pnp.*
 .gitattributes
 .gitignore
 *.ts
+*.log
 tsconfig.json
 yarn.lock
