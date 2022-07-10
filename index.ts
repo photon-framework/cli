@@ -5,7 +5,20 @@ import { writeFile } from "fs/promises";
 import { bundle, serve } from "./src/bundle";
 
 if (!isNaN(options.serve) && options.serve) {
-  serve();
+  tryToCatch(async () => {
+    {
+      const [err] = await tryToCatch(require("./src/prebuild").prebuild);
+      if (err) {
+        exit(500, err);
+      }
+    }
+
+    await serve();
+  }).then(([err]) => {
+    if (err) {
+      exit(500, err);
+    }
+  });
 } else {
   tryToCatch(async () => {
     {
