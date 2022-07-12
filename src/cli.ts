@@ -48,13 +48,23 @@ Options:
   );
 };
 
-const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+const now = () => {
+  const d = new Date();
+
+  return [
+    d.getHours().toString().padStart(2, "0"),
+    d.getMinutes().toString().padStart(2, "0"),
+    d.getSeconds().toString().padStart(2, "0"),
+    d.getMilliseconds().toString().padStart(4, "0"),
+  ].join(":");
+};
+
 const logFilePath = resolve("./photon.log");
 {
   const [, , ...args] = process.argv;
   writeFileSync(
     logFilePath,
-    new Date().toISOString() + "\t[INFO]  \t$ photon " + args.join(" ") + EOL,
+    now() + "\t[INFO]  \t$ photon " + args.join(" ") + EOL,
     "utf8"
   );
 }
@@ -64,7 +74,7 @@ const logFile = (message: string, channel: string) => {
     return;
   }
 
-  const ts = new Date().toISOString();
+  const ts = now();
   const channelDisplay = `[${channel}]`.padEnd(9);
   appendFileSync(
     logFilePath,
@@ -90,9 +100,7 @@ export const log = (message: string, channel: logLevel = logLevel.info) => {
     case logLevel.info:
       console.log(
         clear +
-          Color.bgCyan.black(
-            " " + new Date().toLocaleTimeString(locale) + " "
-          ) +
+          Color.bgCyan.black(" " + now() + " ") +
           " " +
           Color.blackBright(message)
       );
@@ -102,9 +110,7 @@ export const log = (message: string, channel: logLevel = logLevel.info) => {
       if (options.verbose) {
         console.debug(
           clear +
-            Color.bgBlackBright.black(
-              " " + new Date().toLocaleTimeString(locale) + " "
-            ) +
+            Color.bgBlackBright.black(" " + now() + " ") +
             " " +
             Color.blackBright(message)
         );
@@ -114,9 +120,7 @@ export const log = (message: string, channel: logLevel = logLevel.info) => {
     case logLevel.warn:
       console.warn(
         clear +
-          Color.bgYellowBright.black(
-            " " + new Date().toLocaleTimeString(locale) + " "
-          ) +
+          Color.bgYellowBright.black(" " + now() + " ") +
           " " +
           Color.yellowBright(message)
       );
@@ -125,9 +129,7 @@ export const log = (message: string, channel: logLevel = logLevel.info) => {
     case logLevel.error:
       console.error(
         clear +
-          Color.bgRedBright.black(
-            " " + new Date().toLocaleTimeString(locale) + " "
-          ) +
+          Color.bgRedBright.black(" " + now() + " ") +
           " " +
           Color.redBright(message)
       );
