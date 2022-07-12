@@ -1,5 +1,5 @@
 import { exit, log, logLevel, options, stopCrashGuard } from "./cli";
-import { relative, resolve } from "path";
+import { relative } from "path";
 import { join as joinPosix } from "path/posix";
 import { Parcel } from "@parcel/core";
 import type { InitialParcelOptions } from "@parcel/types";

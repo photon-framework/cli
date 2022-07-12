@@ -27,6 +27,8 @@ const minifyOptions: MinifyOptions = {
 const refMap = new Map<string, string>();
 
 export const prerender = async (): Promise<void> => {
+  const defaultLang = document.documentElement.lang;
+
   {
     const indexHtml = options.noMinify
       ? dom.serialize()
@@ -65,25 +67,7 @@ export const prerender = async (): Promise<void> => {
       const canonicalHref =
         route === router.dataset.default ? serverUrl("/") : serverUrl(route);
 
-      canonicalLinkEl.href = canonicalHref;
-
-      {
-        const ogUrlEl = document.querySelector(
-          "meta[property='og:url']"
-        ) as HTMLMetaElement | null;
-        if (ogUrlEl) {
-          ogUrlEl.content = canonicalHref;
-        }
-      }
-
-      {
-        const twitterEl = document.querySelector(
-          "meta[property='twitter:url']"
-        ) as HTMLMetaElement | null;
-        if (twitterEl) {
-          twitterEl.content = canonicalHref;
-        }
-      }
+      applyHrefs(canonicalHref);
 
       for (const script of Array.from(router.getElementsByTagName("script"))) {
         script.remove();
@@ -139,6 +123,8 @@ export const prerender = async (): Promise<void> => {
     }
 
     await resolveRefs();
+    document.documentElement.lang = defaultLang;
+    applyHrefs(serverUrl("404.html"));
 
     const htmlOut = dom.serialize();
 
@@ -155,6 +141,7 @@ export const prerender = async (): Promise<void> => {
     }
   }
 };
+
 const resolveRefs = async () => {
   let el: HTMLElement | undefined;
 
@@ -182,5 +169,27 @@ const resolveRefs = async () => {
     })();
 
     el.outerHTML = Mustache.render(refHtml as string, view.plus(el.dataset));
+  }
+};
+
+const applyHrefs = (canonicalHref: string) => {
+  canonicalLinkEl.href = canonicalHref;
+
+  {
+    const ogUrlEl = document.querySelector(
+      "meta[property='og:url']"
+    ) as HTMLMetaElement | null;
+    if (ogUrlEl) {
+      ogUrlEl.content = canonicalHref;
+    }
+  }
+
+  {
+    const twitterEl = document.querySelector(
+      "meta[property='twitter:url']"
+    ) as HTMLMetaElement | null;
+    if (twitterEl) {
+      twitterEl.content = canonicalHref;
+    }
   }
 };
