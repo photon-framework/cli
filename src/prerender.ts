@@ -89,38 +89,7 @@ export const prerender = async (): Promise<void> => {
         script.remove();
       }
 
-      let el: HTMLElement | undefined;
-
-      while (
-        (el = document.querySelector("photon-ref[src]") as
-          | HTMLElement
-          | undefined)
-      ) {
-        const src = el.getAttribute("src")!;
-        const refHtml = await (async () => {
-          if (refMap.has(src)) {
-            return refMap.get(src)!;
-          } else {
-            const [error, ref] = await tryToCatch(
-              readFile,
-              join(options.dist, src),
-              "utf8"
-            );
-
-            if (error) {
-              return exit(500, error.message);
-            } else {
-              refMap.set(src, ref as string);
-              return ref;
-            }
-          }
-        })();
-
-        el.outerHTML = Mustache.render(
-          refHtml as string,
-          view.plus(el.dataset)
-        );
-      }
+      await resolveRefs();
 
       const dir = join(options.dist, route);
       if (!existsSync(dir)) {
@@ -145,7 +114,73 @@ export const prerender = async (): Promise<void> => {
         exit(500, error1.message);
       }
     } else {
-      log(`Skipping "${route}" for prerendering`, logLevel.verbose);
+      log(`Skipping "${route}" for default prerendering`, logLevel.verbose);
     }
+  }
+
+  if (router.dataset.fallback !== router.dataset.default) {
+    log(`Prerendering fallback "${router.dataset.fallback}"`, logLevel.verbose);
+    {
+      const [error, ref] = await tryToCatch(
+        readFile,
+        join(
+          options.dist,
+          router.dataset.content,
+          router.dataset.fallback + ".html"
+        ),
+        "utf8"
+      );
+
+      if (error) {
+        exit(500, error.message);
+      } else if (ref) {
+        router.innerHTML = typeof ref === "string" ? ref : ref.toString();
+      }
+    }
+
+    await resolveRefs();
+
+    const htmlOut = dom.serialize();
+
+    {
+      const [error] = await tryToCatch(
+        writeFile,
+        join(options.dist, "404.html"),
+        options.noMinify ? htmlOut : minify(htmlOut, minifyOptions),
+        "utf8"
+      );
+      if (error) {
+        exit(500, error.message);
+      }
+    }
+  }
+};
+const resolveRefs = async () => {
+  let el: HTMLElement | undefined;
+
+  while (
+    (el = document.querySelector("photon-ref[src]") as HTMLElement | undefined)
+  ) {
+    const src = el.getAttribute("src")!;
+    const refHtml = await (async () => {
+      if (refMap.has(src)) {
+        return refMap.get(src)!;
+      } else {
+        const [error, ref] = await tryToCatch(
+          readFile,
+          join(options.dist, src),
+          "utf8"
+        );
+
+        if (error) {
+          return exit(500, error.message);
+        } else {
+          refMap.set(src, ref as string);
+          return ref;
+        }
+      }
+    })();
+
+    el.outerHTML = Mustache.render(refHtml as string, view.plus(el.dataset));
   }
 };
