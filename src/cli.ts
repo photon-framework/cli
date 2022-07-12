@@ -7,7 +7,7 @@ import {
   statSync,
   writeFileSync,
 } from "fs";
-import { resolve, dirname } from "path";
+import { resolve, dirname, join } from "path";
 import { EOL } from "os";
 import { closeAllWindows } from "./windows";
 
@@ -31,17 +31,19 @@ const help = () => {
     $ photon-cli [options ...]
 
 Options:
-    ${highlight("--path")}          -p    Specify input directory
+    ${highlight("--help")}          -h    Show this help message
     ${highlight("--source")}        -s    Specify source directory
     ${highlight(
       "--serve"
     )}               Specify a port to host the app and watch for changes
-    ${highlight("--help")}          -h    Show this help message
+    ${highlight(
+      "--open"
+    )}                Open the app in a browser (only works with --serve)
     ${highlight("--verbose")}       -v    Verbose output
     ${highlight("--no-robots")}           Disable generation of robots.txt
     ${highlight(
       "--no-pbs"
-    )}                Disable pre build steps (like Markdown)
+    )}              Disable pre build steps (like Markdown)
     ${highlight("--no-sitemap")}          Disable generation of sitemap.xml
     ${highlight("--no-minify")}           Disable minification of files
 `)
@@ -221,6 +223,13 @@ export const options = (() => {
           defaultValue: false,
         },
         {
+          name: "open",
+          lazyMultiple: false,
+          multiple: false,
+          type: Boolean,
+          defaultValue: false,
+        },
+        {
           name: "help",
           alias: "h",
           lazyMultiple: false,
@@ -291,6 +300,7 @@ export const options = (() => {
   dist: string;
   source: string;
   serve: number;
+  open: boolean;
   help: boolean;
   verbose: boolean;
   noRobots: boolean;
@@ -331,20 +341,37 @@ console.log("");
 if (options.help) {
   help();
   exit();
-} else if (
-  typeof options.serve === "number" &&
-  !isNaN(options.serve) &&
-  options.serve < 1
+}
+
+if (
+  options.serve &&
+  (typeof options.serve !== "number" ||
+    isNaN(options.serve) ||
+    options.serve <= 0 ||
+    options.serve > 65535)
 ) {
-  exit(401, `Port ${options.serve} is not valid`);
-} else {
+  exit(400, `Invalid port "${options.serve}"`);
+}
+
+if (existsSync(options.source)) {
   const stat = statSync(options.source);
   if (stat.isDirectory()) {
+    (options as any).source = resolve(options.source);
     log(`Input directory "${options.source}"`);
 
-    (options as any).dist = resolve(options.source, "../dist/");
-    log(`Output directory "${options.dist}"`);
+    if (!existsSync(join(options.source, "index.html"))) {
+      exit(400, `No index.html found in source directory "${options.source}"`);
+    } else {
+      (options as any).dist = resolve(options.source, "../dist/");
+      log(`Output directory "${options.dist}"`);
+
+      if (options.dist === options.source) {
+        exit(400, `Source and destination directories must be different`);
+      }
+    }
   } else {
     exit(401, `"${options.source}" is not a directory`);
   }
+} else {
+  exit(401, `Source directory "${options.source}" does not exist`);
 }

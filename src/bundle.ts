@@ -78,7 +78,7 @@ export const bundle = async () => {
 
   const bundler = new Parcel({
     ...baseParcelOptions,
-    mode: "production",
+    mode: "development",
     env: {
       NODE_ENV: "production",
     },
@@ -96,7 +96,7 @@ export const bundle = async () => {
 };
 
 export const serve = () => {
-  log(`Serving "${options.source}" on http://localhost:${options.serve}`);
+  log(`Serve "${options.source}"`);
 
   const bundler = new Parcel({
     ...baseParcelOptions,
@@ -130,7 +130,9 @@ export const serve = () => {
   log("Waiting for build to complete...", logLevel.info);
   setTimeout(() => {
     log(`Serving on http://localhost:${options.serve}`, logLevel.info);
-    openUri(`http://localhost:${options.serve}`);
+    if (options.open) {
+      openUri(`http://localhost:${options.serve}`);
+    }
   }, 4000);
 
   return subscription;
