@@ -1,38 +1,8 @@
 import { promises as fs } from "fs";
-import { join, relative, extname } from "path";
-import showdown from "showdown";
+import { extname, join, relative } from "path";
 import { log, logLevel, options } from "./cli";
-import { systemToPosix } from "./tools";
-
-// h1 role heading
-showdown.extension("heading", () => ({
-  type: "output",
-  regex: /<h1>/,
-  replace: '<h1 role="heading">',
-}));
-
-// a href and data-route
-showdown.extension("anchor", () => ({
-  type: "output",
-  regex: /<a href="(.*?)">/gi,
-  replace: (def: string, href: string) => {
-    if (href.startsWith("https://") || href.startsWith("http://")) {
-      return `<a href="${href}" target="_blank">`;
-    } else {
-      return def;
-    }
-  },
-}));
-
-const md = new showdown.Converter({
-  noHeaderId: true,
-  emoji: true,
-  strikethrough: true,
-  tables: true,
-  underline: true,
-  tasklists: true,
-  extensions: ["heading", "anchor"],
-});
+import * as git from "./prebuild_gitignore";
+import { md } from "./prebuild_md";
 
 export const prebuild = async () => {
   if (options.noPbs) {
@@ -40,15 +10,6 @@ export const prebuild = async () => {
   }
 
   log("Prebuilding");
-
-  const gitignore = [
-    "# this file is auto-generated",
-    "# do not edit manually!",
-  ];
-
-  const ignore = (path: string) => {
-    gitignore.push(systemToPosix(relative(options.source, path)));
-  };
 
   const dirList = [options.source];
   while (dirList.length > 0) {
@@ -61,25 +22,30 @@ export const prebuild = async () => {
         dirList.unshift(filePath);
       } else {
         const ext = extname(filePath);
-        if (ext === ".md") {
+        const outFile =
+          filePath.substring(0, filePath.length - ext.length) + ".html";
+
+        let newContent: string | undefined;
+        switch (ext) {
+          case ".md":
+            newContent = await md(await fs.readFile(filePath, "utf-8"));
+            break;
+        }
+
+        if (newContent) {
           log(
-            `Compiling ${relative(options.source, filePath)}`,
+            `Compiled "${relative(options.source, filePath)}" to "${relative(
+              options.source,
+              outFile
+            )}"`,
             logLevel.verbose
           );
-
-          const outFile = filePath.substring(0, filePath.length - 2) + "html";
-          ignore(outFile);
-          await fs.writeFile(
-            outFile,
-            md.makeHtml(await fs.readFile(filePath, "utf-8"))
-          );
+          git.ignore(outFile);
+          await fs.writeFile(outFile, md(await fs.readFile(filePath, "utf-8")));
         }
       }
     }
   }
 
-  await fs.writeFile(
-    join(options.source, ".gitignore"),
-    gitignore.join("\n") + "\n"
-  );
+  await fs.writeFile(join(options.source, ".gitignore"), git.toString());
 };
