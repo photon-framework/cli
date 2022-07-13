@@ -38,7 +38,7 @@ export const prerender = async (): Promise<void> => {
     await writeFile(indexHtmlPath, indexHtml);
   }
 
-  for (const file of filesIn("content")) {
+  for (const file of filesIn(router.dataset.content)) {
     const route = fileToRoute(file);
 
     if (route === router.dataset.default || route !== router.dataset.fallback) {

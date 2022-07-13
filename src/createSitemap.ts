@@ -28,7 +28,7 @@ export const createSitemap = (): string => {
     urls.appendChild(url);
   }
 
-  for (const file of filesIn("content")) {
+  for (const file of filesIn(router.dataset.content)) {
     const routed = fileToRoute(file);
 
     if (

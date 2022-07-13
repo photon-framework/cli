@@ -17,7 +17,7 @@ export const createRobots = (): string => {
     robots.push("Allow: /");
   }
 
-  for (const file of filesIn("content")) {
+  for (const file of filesIn(router.dataset.content)) {
     log(`Disallowing "${file}" in robots.txt`, logLevel.verbose);
     robots.push("Disallow: " + file);
 

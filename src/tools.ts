@@ -8,8 +8,9 @@ export const systemToPosix = (path: string) => format(parse(path));
 export function filesIn(path: string): Iterable<string> {
   const y = new Array<string>();
 
-  path = join(options.dist, path);
-  const paths = readdirSync(path).map((x) => join(path, x));
+  const _path = join(options.dist, path);
+
+  const paths = readdirSync(_path).map((x) => join(_path, x));
 
   while (paths.length !== 0) {
     const absPath = paths.shift()!;

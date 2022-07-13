@@ -1,20 +1,19 @@
-const router = ((window as any).router ??
-  document.querySelector("*[photon-router]")) as HTMLElement & {
+import { document } from "./dom";
+
+const router = document.querySelector("*[photon-router]") as HTMLElement & {
   dataset: {
-    route?: string;
-    content: string;
-    default: string;
-    fallback: string;
-    homeAsEmpty?: boolean;
-    langSegment?: string;
+    readonly content: string;
+    readonly default: string;
+    readonly fallback: string;
+    readonly homeAsEmpty?: boolean;
+    readonly langSegment?: string;
     languages?: string;
+    preload?: string;
   };
 };
 
-(window as any).router = router;
-
 router.dataset.route ??= router.dataset.default;
-router.dataset.fallback ??= router.dataset.default;
+(router.dataset as any).fallback ??= router.dataset.default;
 
 if (!router) {
   throw new Error("No router found");

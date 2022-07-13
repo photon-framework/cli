@@ -36,6 +36,10 @@ if (!isNaN(options.serve) && options.serve) {
     }
 
     {
+      require("./src/addPreload").addPreload();
+    }
+
+    {
       const [err] = await tryToCatch(require("./src/webmanifest").webmanifest);
       if (err) {
         exit(500, err);
