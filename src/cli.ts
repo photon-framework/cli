@@ -210,6 +210,7 @@ export const options = (() => {
         {
           name: "source",
           alias: "s",
+          defaultValue: "",
           lazyMultiple: false,
           multiple: false,
           type: String,
@@ -338,7 +339,7 @@ if (options.verbose) {
 }
 console.log("");
 
-if (options.help) {
+if (options.help || !options.source) {
   help();
   exit();
 }
