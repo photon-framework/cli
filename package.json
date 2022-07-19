@@ -9,7 +9,7 @@
     "photon": "./index.js"
   },
   "scripts": {
-    "build": "yarn run parcel build \"./index.ts\" --no-source-maps --no-optimize --no-scope-hoist",
+    "build": "yarn run parcel build \"./index.ts\" --no-source-maps",
     "envnode": "echo \"#! /usr/bin/env node\\n\" > index.temp && cat index.js >> index.temp && mv index.temp index.js",
     "test": "node ./index.js \"../homepage/dist/\"",
     "deploy": "yarn npm publish --access public"
