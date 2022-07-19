@@ -12,7 +12,7 @@ export const canonicalLinkEl = document.querySelector(
 
 const url = canonicalLinkEl
   ? new URL(canonicalLinkEl.href)
-  : exit(400, "No canonical link found in the HTML");
+  : (exit(400, "No canonical link found in the HTML") as never);
 
 export const serverUrl = (path: string) => {
   const cUrl = new URL(url);
