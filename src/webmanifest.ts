@@ -110,7 +110,7 @@ export const webmanifest = async () => {
     manifest.icons.push(icon);
   }
 
-  manifest.display ??= "browser";
+  manifest.display ??= "standalone";
   manifest.orientation ??= "any";
   manifest.scope ??= "/";
   manifest.start_url ??= "/";
@@ -168,7 +168,7 @@ interface WebManifest {
   background_color: string;
   description: string;
   dir: "ltr" | "rtl" | "auto";
-  display: "fullscreen" | "standalone" | "minimal-ui" | "browser";
+  display: "fullscreen" | "standalone" | "minimal-ui";
   icons: Array<{
     src: string;
     sizes: string;
