@@ -1,6 +1,6 @@
 import Parcel from "@parcel/core";
 import type { BuildFailureEvent } from "@parcel/types";
-import { exists, existsSync } from "fs";
+import { existsSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
 import { basename, join, relative } from "path";
 import { handleBuildFailureEvent } from "./bundle";
