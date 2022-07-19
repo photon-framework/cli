@@ -2,8 +2,7 @@ import { exit, log, logLevel, options, stopCrashGuard } from "./cli";
 import { relative } from "path";
 import { join as joinPosix } from "path/posix";
 import { Parcel } from "@parcel/core";
-import type { InitialParcelOptions } from "@parcel/types";
-import type { BuildFailureEvent } from "@parcel/types";
+import type { InitialParcelOptions, BuildFailureEvent } from "@parcel/types";
 import { openUri } from "./windows";
 
 const baseParcelOptions: InitialParcelOptions = {
@@ -24,7 +23,7 @@ const baseParcelOptions: InitialParcelOptions = {
   },
 };
 
-const handleBuildFailureEvent = (
+export const handleBuildFailureEvent = (
   err: Error | BuildFailureEvent,
   exitApp: boolean
 ) => {

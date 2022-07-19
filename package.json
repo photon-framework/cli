@@ -9,7 +9,7 @@
     "photon": "./index.js"
   },
   "scripts": {
-    "build": "yarn run parcel build \"./index.ts\" --no-source-maps",
+    "build": "yarn run parcel build \"./index.ts\" --no-source-maps --no-optimize --no-scope-hoist",
     "envnode": "echo \"#! /usr/bin/env node\\n\" > index.temp && cat index.js >> index.temp && mv index.temp index.js",
     "test": "node ./index.js \"../homepage/dist/\"",
     "deploy": "yarn npm publish --access public"
@@ -36,7 +36,8 @@
     "open": "^8.4.0",
     "parcel": "^2.6.2",
     "showdown": "^2.1.0",
-    "try-to-catch": "^3.0.1"
+    "try-to-catch": "^3.0.1",
+    "xxhash-wasm": "^1.0.1"
   },
   "devDependencies": {
     "@parcel/types": "^2.6.2",

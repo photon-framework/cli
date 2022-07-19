@@ -1,3 +1,4 @@
+import "./src/temp";
 import { exit, log, logLevel, options } from "./src/cli";
 import tryToCatch from "try-to-catch";
 import { join } from "path";
@@ -6,6 +7,13 @@ import { bundle, serve } from "./src/bundle";
 
 if (!isNaN(options.serve) && options.serve) {
   tryToCatch(async () => {
+    {
+      const [err] = await tryToCatch(require("./src/clean").clean);
+      if (err) {
+        exit(500, err);
+      }
+    }
+
     {
       const [err] = await tryToCatch(require("./src/prebuild").prebuild);
       if (err) {
@@ -22,9 +30,18 @@ if (!isNaN(options.serve) && options.serve) {
 } else {
   tryToCatch(async () => {
     {
+      const [err] = await tryToCatch(require("./src/clean").clean);
+      if (err) {
+        exit(500, err);
+        return;
+      }
+    }
+
+    {
       const [err] = await tryToCatch(require("./src/prebuild").prebuild);
       if (err) {
         exit(500, err);
+        return;
       }
     }
 
@@ -32,6 +49,17 @@ if (!isNaN(options.serve) && options.serve) {
       const [err] = await tryToCatch(bundle);
       if (err) {
         exit(500, err);
+        return;
+      }
+    }
+
+    {
+      const [err] = await tryToCatch(
+        require("./src/serviceWorker").serviceWorker
+      );
+      if (err) {
+        exit(500, err);
+        return;
       }
     }
 
@@ -43,6 +71,7 @@ if (!isNaN(options.serve) && options.serve) {
       const [err] = await tryToCatch(require("./src/webmanifest").webmanifest);
       if (err) {
         exit(500, err);
+        return;
       }
     }
 
@@ -60,6 +89,7 @@ if (!isNaN(options.serve) && options.serve) {
       );
       if (err) {
         exit(500, err);
+        return;
       }
     }
 
@@ -77,6 +107,7 @@ if (!isNaN(options.serve) && options.serve) {
       );
       if (err) {
         exit(500, err);
+        return;
       }
     }
 
@@ -85,17 +116,21 @@ if (!isNaN(options.serve) && options.serve) {
       const [err] = await tryToCatch(require("./src/prerender").prerender);
       if (err) {
         exit(500, err);
+        return;
       }
     }
   }).then(([err]) => {
     if (err) {
       if ((err as Error).message) {
         exit(500, (err as Error).message);
+        return;
       } else {
         exit(500, String(err));
+        return;
       }
     } else {
       exit();
+      return;
     }
   });
 }

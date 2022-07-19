@@ -10,6 +10,7 @@ import {
 import { resolve, dirname, join } from "path";
 import { EOL } from "os";
 import { closeAllWindows } from "./windows";
+import { cleanTemp } from "./temp";
 
 console.log(
   Color.magentaBright(`
@@ -46,6 +47,9 @@ Options:
     )}              Disable pre build steps (like Markdown)
     ${highlight("--no-sitemap")}          Disable generation of sitemap.xml
     ${highlight("--no-minify")}           Disable minification of files
+    ${highlight(
+      "--sw"
+    )}                  Add a service worker (specify a path to the JS-file)
 `)
   );
 };
@@ -93,8 +97,12 @@ export enum logLevel {
 }
 
 const clear = "\x1b[2K\x1b[0G";
-
+let doLogging = true;
 export const log = (message: string, channel: logLevel = logLevel.info) => {
+  if (!doLogging) {
+    return;
+  }
+
   crashGuard();
   logFile(message, channel);
 
@@ -148,12 +156,22 @@ const throbber = Color.throbber(
 );
 throbber.start();
 
-export const exit = (code: number = 0, message: string | Error = "") => {
+export const exit = async (code: number = 0, message: string | Error = "") => {
+  {
+    const stack = new Error().stack;
+    if (stack) {
+      log(stack, logLevel.verbose);
+    }
+  }
+
+  doLogging = false;
+
   throbber.stop();
   if (crashGuardId) {
     clearInterval(crashGuardId);
   }
   closeAllWindows();
+  await cleanTemp();
 
   console.log(clear);
 
@@ -274,6 +292,13 @@ export const options = (() => {
           type: Boolean,
           defaultValue: false,
         },
+        {
+          name: "sw",
+          lazyMultiple: false,
+          multiple: false,
+          type: String,
+          defaultValue: "",
+        },
       ],
       {
         stopAtFirstUnknown: true,
@@ -308,6 +333,7 @@ export const options = (() => {
   noSitemap: boolean;
   noMinify: boolean;
   noPbs: boolean;
+  sw: string;
 }>;
 
 const artifactPath = process.argv[1];
@@ -368,6 +394,17 @@ if (existsSync(options.source)) {
 
       if (options.dist === options.source) {
         exit(400, `Source and destination directories must be different`);
+      }
+
+      if (options.sw) {
+        if (existsSync(options.sw)) {
+          (options as any).sw = resolve(options.sw);
+          log(`Service worker file "${options.sw}"`);
+        } else {
+          exit(400, `Service worker file "${options.sw}" not found`);
+        }
+      } else {
+        (options as any).sw = false;
       }
     }
   } else {
