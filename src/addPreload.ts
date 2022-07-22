@@ -1,8 +1,11 @@
-import { log, logLevel } from "./cli";
+import { existsSync } from "fs";
+import { stat } from "fs/promises";
+import { join } from "path";
+import { log, logLevel, options } from "./cli";
 import { router } from "./router";
 import { filesIn, fileToRoute } from "./tools";
 
-export const addPreload = () => {
+export const addPreload = async () => {
   log("Adding preload paths", logLevel.info);
 
   const preload = new Array<string>();
@@ -14,13 +17,22 @@ export const addPreload = () => {
   for (const file of filesIn(router.dataset.content)) {
     const route = fileToRoute(file);
 
-    if (route === router.dataset.default || route !== router.dataset.fallback) {
+    if (
+      file.endsWith(".html") &&
+      (route === router.dataset.default || route !== router.dataset.fallback)
+    ) {
       preload.push(route);
 
       if (doLang) {
         const lang = route.split("/").filter(Boolean)[langSegment];
         if (lang) {
-          languages.add(lang);
+          const langPath = join(options.dist, router.dataset.content, lang);
+          if (existsSync(langPath)) {
+            const langStat = await stat(langPath);
+            if (langStat.isDirectory()) {
+              languages.add(lang);
+            }
+          }
         }
       }
     }

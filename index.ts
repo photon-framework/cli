@@ -64,7 +64,11 @@ if (!isNaN(options.serve) && options.serve) {
     }
 
     {
-      require("./src/addPreload").addPreload();
+      const [err] = await tryToCatch(require("./src/addPreload").addPreload);
+      if (err) {
+        exit(500, err);
+        return;
+      }
     }
 
     {
