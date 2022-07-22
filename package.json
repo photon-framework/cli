@@ -44,7 +44,7 @@
     "@types/cli-color": "^2.0.2",
     "@types/command-line-args": "^5.2.0",
     "@types/html-minifier": "^4.0.2",
-    "@types/jsdom": "^16.2.14",
+    "@types/jsdom": "^16.2.15",
     "@types/mustache": "^4.2.1",
     "@types/node": "^18.0.6",
     "@types/showdown": "^2.0.0",
