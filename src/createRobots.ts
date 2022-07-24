@@ -6,12 +6,7 @@ import { router } from "./router";
 import { filesIn, fileToRoute } from "./tools";
 
 export const createRobots = (): string => {
-  const robots = [
-    "User-agent: *",
-    "Disallow: *.css",
-    "Disallow: *.svg",
-    "Disallow: *.js",
-  ];
+  const robots = ["User-agent: *"];
 
   if (router.dataset.homeAsEmpty) {
     robots.push("Allow: /");
