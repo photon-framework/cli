@@ -25,7 +25,7 @@
   "author": "Frank Mayer <frank.mayer1907@protonmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@parcel/config-default": "^2.6.2",
+    "@parcel/config-default": "^2.7.0",
     "@parcel/core": "^2.6.2",
     "cli-color": "^2.0.3",
     "command-line-args": "^5.2.1",
