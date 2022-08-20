@@ -3,7 +3,8 @@ import { join, parse, relative } from "path";
 import { format } from "path/posix";
 import { options } from "./cli";
 
-export const systemToPosix = (path: string) => format(parse(path));
+export const systemToPosix = (path: string) =>
+  format(parse(path)).replace("\\", "/");
 
 export function filesIn(path: string): Iterable<string> {
   const y = new Array<string>();
