@@ -40,7 +40,7 @@
     "xxhash-wasm": "^1.0.1"
   },
   "devDependencies": {
-    "@parcel/types": "^2.6.2",
+    "@parcel/types": "^2.8.0",
     "@types/cli-color": "^2.0.2",
     "@types/command-line-args": "^5.2.0",
     "@types/html-minifier": "^4.0.2",
